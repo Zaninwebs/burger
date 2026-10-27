@@ -26,7 +26,7 @@ export default function Highlights() {
       <div className="container">
         <header className="highlights__head">
           <div>
-            <p className="eyebrow" data-reveal>
+            <p className="eyebrow" data-index="01" data-reveal>
               Kulinarische Highlights
             </p>
             <h2 id="highlights-title" className="section-title" data-reveal style={{ "--reveal-delay": 80 } as CSSProperties}>

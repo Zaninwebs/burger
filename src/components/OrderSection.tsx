@@ -13,7 +13,7 @@ export default function OrderSection() {
   return (
     <section id="bestellen" className="section order on-dark" aria-labelledby="order-title">
       <div className="container">
-        <p className="eyebrow" data-reveal>
+        <p className="eyebrow" data-index="06" data-reveal>
           Bestellung &amp; Kontakt
         </p>
         <h2 id="order-title" className="section-title order__title" data-reveal>

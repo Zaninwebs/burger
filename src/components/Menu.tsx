@@ -89,7 +89,7 @@ export default function Menu() {
     <section id="speisekarte" className="section menu" aria-labelledby="menu-title">
       <div className="container">
         <header className="menu__head">
-          <p className="eyebrow" data-reveal>
+          <p className="eyebrow" data-index="02" data-reveal>
             Speisekarte
           </p>
           <h2 id="menu-title" className="section-title" data-reveal>

@@ -29,7 +29,7 @@ export default function Gallery() {
     <section className="section gallery" aria-labelledby="gallery-title">
       <div className="container gallery__head">
         <div>
-          <p className="eyebrow" data-reveal>
+          <p className="eyebrow" data-index="05" data-reveal>
             Galerie
           </p>
           <h2 id="gallery-title" className="section-title" data-reveal>
