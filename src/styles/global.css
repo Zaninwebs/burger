@@ -458,3 +458,8 @@ ol {
   display: inline-block;
   will-change: transform;
 }
+
+/* the lily keeps its proportions wherever only a width is set */
+.emblem {
+  height: auto;
+}

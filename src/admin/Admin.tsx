@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ORDER_STATUS_LABEL, PAYMENT_LABEL, formatEuro, type Order, type OrderStatus } from "../../shared/orders";
 import {
   STATUS_LABEL,
   addDays,
@@ -32,13 +33,13 @@ async function call<T>(path: string, token: string | null, init?: RequestInit): 
   return body as T;
 }
 
-type Tab = "list" | "slots" | "settings";
+type Tab = "orders" | "list" | "slots" | "settings";
 const STATUSES: ReservationStatus[] = ["pending", "confirmed", "declined", "completed"];
 const WEEKDAY_NAMES = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"];
 
 export default function Admin() {
   const [token, setToken] = useState<string | null>(() => sessionStorage.getItem(TOKEN_KEY));
-  const [tab, setTab] = useState<Tab>("list");
+  const [tab, setTab] = useState<Tab>("orders");
   const [notice, setNotice] = useState("");
 
   useEffect(() => {
@@ -80,13 +81,13 @@ export default function Admin() {
         <div className="adm__brand">
           <Emblem className="adm__lily" title="" />
           <span>
-            <strong>Casa Ducale</strong> · Reservierungen
+            <strong>Casa Ducale</strong> · Admin
           </span>
         </div>
         <nav className="adm__tabs" aria-label="Bereiche">
-          {(["list", "slots", "settings"] as Tab[]).map((t) => (
+          {(["orders", "list", "slots", "settings"] as Tab[]).map((t) => (
             <button key={t} className={tab === t ? "is-active" : ""} onClick={() => setTab(t)} aria-current={tab === t}>
-              {{ list: "Anfragen", slots: "Zeitfenster", settings: "Einstellungen" }[t]}
+              {{ orders: "Abholung", list: "Reservierungen", slots: "Zeitfenster", settings: "Einstellungen" }[t]}
             </button>
           ))}
         </nav>
@@ -100,6 +101,7 @@ export default function Admin() {
         </p>
       )}
       <main className="adm__main">
+        {tab === "orders" && <Orders api={api} notify={setNotice} />}
         {tab === "list" && <List api={api} notify={setNotice} />}
         {tab === "slots" && <Slots api={api} notify={setNotice} />}
         {tab === "settings" && <SettingsForm api={api} notify={setNotice} />}
@@ -305,6 +307,208 @@ function List({ api, notify }: { api: Api; notify: (s: string) => void }) {
   );
 }
 
+// ------------------------------------------------------------------ orders
+
+/** Next step for each status, shown as the main button. */
+const NEXT: Partial<Record<OrderStatus, [OrderStatus, string]>> = {
+  new: ["accepted", "Annehmen"],
+  accepted: ["ready", "Abholbereit"],
+  ready: ["picked_up", "Abgeholt"],
+};
+
+function beep() {
+  try {
+    const ctx = new AudioContext();
+    [0, 0.18].forEach((t) => {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.frequency.value = 880;
+      g.gain.setValueAtTime(0.25, ctx.currentTime + t);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + t + 0.15);
+      o.connect(g).connect(ctx.destination);
+      o.start(ctx.currentTime + t);
+      o.stop(ctx.currentTime + t + 0.16);
+    });
+  } catch {
+    /* audio blocked until the first click */
+  }
+}
+
+function Orders({ api, notify }: { api: Api; notify: (s: string) => void }) {
+  const today = berlinNow().date;
+  const [range, setRange] = useState<"open" | "today" | "week" | "past">("open");
+  const [items, setItems] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const known = useRef<Set<string> | null>(null);
+
+  const [from, to] = useMemo(() => {
+    if (range === "past") return [addDays(today, -14), addDays(today, -1)];
+    if (range === "week") return [today, addDays(today, 7)];
+    if (range === "today") return [today, today];
+    return [today, addDays(today, 3)];
+  }, [range, today]);
+
+  const load = useCallback(async () => {
+    setError("");
+    try {
+      const res = await api<{ orders: Order[] }>(`orders?from=${from}&to=${to}`);
+      // new paid/cash orders since the last poll → sound
+      const ready = res.orders.filter((o) => o.status === "new" && o.paymentStatus !== "open");
+      if (known.current && ready.some((o) => !known.current!.has(o.id))) beep();
+      known.current = new Set(ready.map((o) => o.id));
+      setItems(res.orders);
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setLoading(false);
+    }
+  }, [api, from, to]);
+
+  useEffect(() => {
+    setLoading(true);
+    known.current = null;
+    void load();
+    const t = setInterval(load, 20_000);
+    return () => clearInterval(t);
+  }, [load]);
+
+  const fresh = items.filter((o) => o.status === "new" && o.paymentStatus !== "open").length;
+  useEffect(() => {
+    document.title = fresh ? `(${fresh}) Neue Abholung · Casa Ducale` : "Casa Ducale · Admin";
+  }, [fresh]);
+
+  const update = async (o: Order, status: OrderStatus) => {
+    if (status === "cancelled" && !confirm(`Abholung ${o.code} von ${o.name} stornieren?`)) return;
+    try {
+      const res = await api<{ order: Order; guestNotified: boolean }>(`orders/${o.id}`, { method: "PATCH", body: JSON.stringify({ status }) });
+      setItems((xs) => xs.map((x) => (x.id === o.id ? res.order : x)));
+      notify(`${o.code} · ${ORDER_STATUS_LABEL[status]}${res.guestNotified ? " · Gast per E-Mail informiert" : ""}`);
+    } catch (e) {
+      notify((e as Error).message);
+    }
+  };
+
+  const remove = async (o: Order) => {
+    if (!confirm(`Abholung ${o.code} endgültig löschen?`)) return;
+    try {
+      await api(`orders/${o.id}`, { method: "DELETE" });
+      setItems((xs) => xs.filter((x) => x.id !== o.id));
+      notify("Abholung gelöscht.");
+    } catch (e) {
+      notify((e as Error).message);
+    }
+  };
+
+  const shown = items.filter((o) => (range === "open" ? !["picked_up", "cancelled"].includes(o.status) : true));
+  const byDate = shown.reduce<Record<string, Order[]>>((acc, o) => {
+    (acc[o.date] ??= []).push(o);
+    return acc;
+  }, {});
+  const revenue = items.filter((o) => o.status !== "cancelled" && o.paymentStatus !== "open").reduce((n, o) => n + o.totalCents, 0);
+
+  return (
+    <section>
+      <div className="adm-toolbar">
+        <div className="adm-seg" role="group" aria-label="Ansicht">
+          {(
+            [
+              ["open", "Offen"],
+              ["today", "Heute"],
+              ["week", "7 Tage"],
+              ["past", "Vergangen"],
+            ] as const
+          ).map(([k, l]) => (
+            <button key={k} className={range === k ? "is-active" : ""} onClick={() => setRange(k)}>
+              {l}
+            </button>
+          ))}
+        </div>
+        <button className="adm-refresh" onClick={() => void load()}>
+          Aktualisieren
+        </button>
+      </div>
+
+      <p className="adm-kpi">
+        <strong>{fresh}</strong> neu · <strong>{formatEuro(revenue)}</strong> Umsatz im Zeitraum · aktualisiert sich automatisch
+      </p>
+
+      {error && <p className="adm-error">{error}</p>}
+      {loading && <p className="adm-empty">Lade …</p>}
+      {!loading && shown.length === 0 && <p className="adm-empty">Keine Abholungen in diesem Zeitraum.</p>}
+
+      {Object.entries(byDate).map(([date, list]) => (
+        <div key={date} className="adm-day">
+          <h2>
+            {formatDateLong(date)}
+            <span>{list.length} Abholungen</span>
+          </h2>
+          <ul>
+            {list.map((o) => {
+              const unpaid = o.paymentStatus === "open";
+              const next = NEXT[o.status];
+              return (
+                <li key={o.id} className={`adm-res adm-order is-${o.status} ${unpaid ? "is-unpaid" : ""}`}>
+                  <div className="adm-res__time">
+                    {o.time}
+                    <span className="adm-order__code">{o.code}</span>
+                  </div>
+                  <div className="adm-res__main">
+                    <p className="adm-res__name">
+                      {o.name}
+                      <span className={`adm-badge is-o-${o.status}`}>{ORDER_STATUS_LABEL[o.status]}</span>
+                      <span className={`adm-pay is-${o.paymentStatus}`}>{PAYMENT_LABEL[o.paymentStatus]}</span>
+                    </p>
+                    <p className="adm-res__contact">
+                      <a href={`tel:${o.phone.replace(/[^\d+]/g, "")}`}>{o.phone}</a>
+                      {o.email && (
+                        <>
+                          {" "}
+                          · <a href={`mailto:${o.email}`}>{o.email}</a>
+                        </>
+                      )}
+                    </p>
+                    <ul className="adm-order__lines">
+                      {o.lines.map((l) => (
+                        <li key={l.id}>
+                          <strong>{l.qty} ×</strong> {l.name}
+                          <span>{formatEuro(l.qty * l.cents)}</span>
+                        </li>
+                      ))}
+                      <li className="adm-order__sum">
+                        Summe <span>{formatEuro(o.totalCents)}</span>
+                      </li>
+                    </ul>
+                    {o.note && <p className="adm-res__msg">„{o.note}“</p>}
+                    {unpaid && <p className="adm-res__meta adm-warn">Online-Zahlung noch nicht abgeschlossen – bitte noch nicht zubereiten.</p>}
+                    <p className="adm-res__meta">Eingegangen: {new Date(o.createdAt).toLocaleString("de-DE")}</p>
+                  </div>
+                  <div className="adm-res__actions">
+                    {next && !unpaid && (
+                      <button className="is-ok" onClick={() => update(o, next[0])}>
+                        {next[1]}
+                      </button>
+                    )}
+                    {o.status !== "cancelled" && o.status !== "picked_up" && (
+                      <button className="is-no" onClick={() => update(o, "cancelled")}>
+                        Stornieren
+                      </button>
+                    )}
+                    {(o.status === "picked_up" || o.status === "cancelled") && <button onClick={() => update(o, "new")}>Zurück auf neu</button>}
+                    <button className="is-del" onClick={() => remove(o)}>
+                      Löschen
+                    </button>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      ))}
+    </section>
+  );
+}
+
 // ------------------------------------------------------------------ slots
 
 type DayInfo = { date: string; open: boolean; dayBlocked: boolean; capacity: number; slots: { time: string; booked: number; blocked: boolean }[] };
@@ -455,6 +659,27 @@ function SettingsForm({ api, notify }: { api: Api; notify: (s: string) => void }
           <input type="number" min={1} max={365} value={s.retentionDays} onChange={num("retentionDays")} />
         </label>
       </div>
+
+      <h2>Abholung</h2>
+      <div className="adm-grid">
+        <label className="adm-check">
+          <input type="checkbox" checked={s.ordersEnabled} onChange={(e) => setS({ ...s, ordersEnabled: e.target.checked })} />
+          Online-Abholung annehmen
+        </label>
+        <label>
+          Abholung ab (Uhrzeit)
+          <input type="time" value={s.pickupFrom} onChange={(e) => setS({ ...s, pickupFrom: e.target.value })} />
+        </label>
+        <label>
+          Abholung bis (Uhrzeit)
+          <input type="time" value={s.pickupUntil} onChange={(e) => setS({ ...s, pickupUntil: e.target.value })} />
+        </label>
+        <label>
+          Zubereitungszeit (Minuten)
+          <input type="number" min={0} max={240} value={s.pickupLeadMinutes} onChange={num("pickupLeadMinutes")} />
+        </label>
+      </div>
+      <p className="adm-res__meta">Abholung ist an den Wochentagen möglich, die unten geöffnet sind. Bei viel Betrieb einfach „annehmen“ ausschalten.</p>
 
       <h2>Wochentage &amp; Zeitfenster</h2>
       <div className="adm-gen">

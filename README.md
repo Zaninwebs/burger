@@ -40,7 +40,27 @@ Unter *Site configuration → Environment variables* setzen:
 | `NOTIFY_EMAIL` | nein | Empfänger für neue Anfragen (Restaurant) |
 | `MAIL_FROM` | nein | Absender, z. B. `Casa Ducale <reservierung@casa-ducale-leverkusen.de>` (Domain bei Resend verifizieren) |
 
+| `STRIPE_SECRET_KEY` | nein | Aktiviert „Online bezahlen“ bei der Abholung (Stripe Checkout: Karte, PayPal, Apple/Google Pay – je nach Stripe-Dashboard) |
+| `STRIPE_WEBHOOK_SECRET` | nein | Webhook-Endpunkt `https://<domain>/api/orders/stripe-webhook`, Ereignis `checkout.session.completed` |
+| `SITE_URL` | nein | Öffentliche Adresse für die Rückkehr von Stripe (Standard: Netlify-`URL`) |
+
 Ohne Resend funktioniert alles – Anfragen erscheinen dann nur im Admin-Bereich.
+Ohne Stripe ist bei der Abholung nur „Bar bei Abholung“ wählbar.
+
+## Essen zum Abholen
+
+Gäste tippen in der Speisekarte auf **+**, wählen eine Abholzeit (15-Minuten-Raster, heute und die
+nächsten 2 Tage) und zahlen **bar bei Abholung** oder **online**. Es gibt keine Lieferung.
+
+- Bestellbar sind nur Gerichte mit festem Preis in `src/data/menu.ts` (z. B. `"9,80"`). Spannen
+  („6,30 – 8,10“), „ab …“ und Gerichte ohne Preis erscheinen ohne **+**.
+- Der Server rechnet die Summe immer selbst aus der Karte – Preise aus dem Browser werden ignoriert.
+- ⚠︎ Vor dem Livegang die Preise mit der aktuellen Karte des Restaurants abgleichen.
+- Admin → **Abholung**: neue Bestellungen mit Ton und Zähler im Tab-Titel (alle 20 s aktualisiert),
+  Schritte *Annehmen → Abholbereit → Abgeholt* oder *Stornieren*. Mit E-Mail-Adresse wird der Gast
+  bei jedem Schritt informiert (wenn Resend eingerichtet ist).
+- Admin → **Einstellungen → Abholung**: an/aus (z. B. bei viel Betrieb), Abholzeitfenster,
+  Zubereitungszeit.
 
 ## Reservierungen verwalten
 

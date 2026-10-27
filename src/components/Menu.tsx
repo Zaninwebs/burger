@@ -2,6 +2,7 @@ import { useLayoutEffect, useRef, useState } from "react";
 import { menu, MENU_NOTE } from "../data/menu";
 import { gsap, prefersReducedMotion } from "../lib/motion";
 import Emblem from "./Emblem";
+import { AddToCart } from "./Order";
 import { Button, Lines, revealOnScroll, useGsap } from "./ui";
 import "./Menu.css";
 
@@ -140,12 +141,15 @@ export default function Menu() {
                       </span>
                     )}
                   </span>
+                  <AddToCart category={category.id} name={d.name} />
                 </div>
                 {d.description && <p className="dish__desc muted">{d.description}</p>}
               </li>
             ))}
           </ul>
-          <p className="menu-cat__note">{MENU_NOTE}</p>
+          <p className="menu-cat__note">
+            Mit <span className="menu-cat__plus" aria-hidden="true">+</span> wählen Sie Gerichte zum Abholen aus. {MENU_NOTE}
+          </p>
           <Button href="#reservieren" cursor="Reserve">
             Tisch reservieren
           </Button>

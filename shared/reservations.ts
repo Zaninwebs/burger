@@ -54,6 +54,12 @@ export type Settings = {
   /** guests may request any time in this window; the owner confirms */
   openFrom: string;
   openUntil: string;
+  /** pickup orders ("Bestellen & Abholen") can be paused by the owner */
+  ordersEnabled: boolean;
+  /** pickup window and the minimum preparation time for new orders */
+  pickupFrom: string;
+  pickupUntil: string;
+  pickupLeadMinutes: number;
 };
 
 export type Blocks = {
@@ -87,6 +93,10 @@ export const DEFAULT_SETTINGS: Settings = {
   retentionDays: 30,
   openFrom: "08:30",
   openUntil: "21:30",
+  ordersEnabled: true,
+  pickupFrom: "11:30",
+  pickupUntil: "21:30",
+  pickupLeadMinutes: 30,
 };
 
 export function toMinutes(t: string): number {

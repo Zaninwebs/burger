@@ -65,6 +65,7 @@ export const nav = [
   { href: "#restaurant", label: "Restaurant" },
   { href: "#kueche", label: "Küche" },
   { href: "#speisekarte", label: "Speisekarte" },
+  { href: "#abholen", label: "Abholen" },
   { href: "#feiern", label: "Feiern" },
   { href: "#galerie", label: "Galerie" },
   { href: "#besuch", label: "Kontakt" },

@@ -9,6 +9,7 @@ import Hero from "./components/Hero";
 import Kitchen from "./components/Kitchen";
 import Marchio from "./components/Marchio";
 import Menu from "./components/Menu";
+import { CartBar, Pickup } from "./components/Order";
 import Reservation from "./components/Reservation";
 import Story from "./components/Story";
 import { initSmoothScroll, ScrollTrigger, scrollToHash } from "./lib/motion";
@@ -33,6 +34,7 @@ export default function App() {
         <Story />
         <Marchio />
         <Kitchen />
+        <Pickup />
         <Menu />
         <Atmosphere />
         <Events />
@@ -41,6 +43,7 @@ export default function App() {
       </main>
       <Footer />
       <StickyCta />
+      <CartBar />
       <Cursor />
     </>
   );

@@ -3,7 +3,6 @@
 import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 import {
   ACTIVE_STATUSES,
-  DEFAULT_SETTINGS,
   STATUS_LABEL,
   addDays,
   berlinNow,
@@ -20,23 +19,12 @@ import {
   type ReservationStatus,
   type Settings,
 } from "../shared/reservations.ts";
+import { fail, json } from "./http.ts";
+import { adminOrders, orders } from "./orders.ts";
+import { getSettings } from "./settings.ts";
 import { store } from "./store.ts";
 
-const json = (data: unknown, status = 200) =>
-  new Response(JSON.stringify(data), {
-    status,
-    headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" },
-  });
-
-const fail = (status: number, code: string, message: string, extra: object = {}) =>
-  json({ error: code, message, ...extra }, status);
-
 // ------------------------------------------------------------------ storage
-
-async function getSettings(): Promise<Settings> {
-  const saved = await store().get<Partial<Settings>>("settings");
-  return { ...DEFAULT_SETTINGS, ...saved, weekdays: { ...DEFAULT_SETTINGS.weekdays, ...saved?.weekdays } };
-}
 
 async function getBlocks(): Promise<Blocks> {
   return (await store().get<Blocks>("blocks")) ?? {};
@@ -300,6 +288,8 @@ async function admin(req: Request, url: URL, parts: string[]): Promise<Response>
     }
   }
 
+  if (resource === "orders") return adminOrders(req, url, id);
+
   if (resource === "settings") {
     if (req.method === "GET") return json({ settings: await getSettings() });
     if (req.method === "PUT") {
@@ -362,6 +352,10 @@ function checkSettings(s: Settings | null): string | null {
   const hhmm = /^([01]\d|2[0-3]):[0-5]\d$/;
   if (!hhmm.test(s.openFrom ?? "") || !hhmm.test(s.openUntil ?? "") || s.openFrom >= s.openUntil)
     return "Reservierungszeiten: „von“ muss vor „bis“ liegen.";
+  if (typeof s.ordersEnabled !== "boolean") return "Bestellungen: an/aus fehlt.";
+  if (!hhmm.test(s.pickupFrom ?? "") || !hhmm.test(s.pickupUntil ?? "") || s.pickupFrom >= s.pickupUntil)
+    return "Abholzeiten: „von“ muss vor „bis“ liegen.";
+  if (!int(s.pickupLeadMinutes, 0, 240)) return "Zubereitungszeit: 0–240 Minuten.";
   for (let d = 0; d < 7; d++) {
     const day = s.weekdays?.[String(d)];
     if (!day || typeof day.open !== "boolean" || !Array.isArray(day.slots)) return "Wochentage unvollständig.";
@@ -376,6 +370,7 @@ export async function handle(req: Request): Promise<Response> {
   try {
     if (parts[0] === "availability" && req.method === "GET") return await availability(url);
     if (parts[0] === "reservations" && req.method === "POST" && parts.length === 1) return await createReservation(req);
+    if (parts[0] === "orders") return await orders(req, parts.slice(1));
     if (parts[0] === "admin") return await admin(req, url, parts.slice(1));
     return fail(404, "not_found", "Nicht gefunden.");
   } catch (err) {

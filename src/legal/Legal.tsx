@@ -131,13 +131,25 @@ export function Datenschutz() {
           <strong>Benachrichtigung:</strong> Über neue Anfragen wird das Restaurant per E-Mail informiert. Dafür nutzen
           wir <Todo>E-Mail-Dienst, z. B. Resend</Todo> als Auftragsverarbeiter.
         </p>
+        <p>
+          <strong>Essen zum Abholen:</strong> Wenn Sie Gerichte zur Abholung auswählen, verarbeiten wir die gewählten
+          Gerichte, die Abholzeit, Ihren Namen, Ihre Telefonnummer, freiwillig Ihre E-Mail-Adresse und Ihren Hinweis, um
+          die Bestellung zuzubereiten und zu übergeben (Art. 6 Abs. 1 lit. b DSGVO). Es gilt dieselbe Speicherdauer wie
+          bei Reservierungen; steuerliche Aufbewahrungspflichten für Belege bleiben unberührt.
+        </p>
+        <p>
+          <strong>Online-Zahlung:</strong> Wählen Sie „Online bezahlen“, werden Sie zum Zahlungsdienstleister{" "}
+          <Todo>Stripe Payments Europe, Ltd., 1 Grand Canal Street Lower, Dublin 2, Irland</Todo> weitergeleitet. Dort
+          geben Sie Ihre Zahlungsdaten direkt ein; wir erhalten sie nicht, sondern nur die Bestätigung der Zahlung.
+          Es gelten zusätzlich die Datenschutzhinweise des Zahlungsdienstleisters.
+        </p>
       </section>
 
       <section>
         <h2>4. Keine Cookies, kein Tracking</h2>
         <p>
           Diese Website setzt keine Cookies und verwendet keine Analyse- oder Werbedienste. Im Browser wird lediglich
-          gespeichert, ob die Eingangsanimation in dieser Sitzung bereits gezeigt wurde und – falls Sie die Karte laden – Ihre Entscheidung zur Kartenanzeige.
+          gespeichert, ob die Eingangsanimation in dieser Sitzung bereits gezeigt wurde, welche Gerichte Sie zum Abholen ausgewählt haben und – falls Sie die Karte laden – Ihre Entscheidung zur Kartenanzeige.
         </p>
       </section>
 

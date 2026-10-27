@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { gsap, isFinePointer, prefersReducedMotion } from "../lib/motion";
+import { useCart } from "../lib/cart";
 import { Button } from "./ui";
 import "./Chrome.css";
 
@@ -51,7 +52,10 @@ export function Cursor() {
 
 /** Mobile bottom CTA — appears after the hero, hides near the form and footer. */
 export function StickyCta() {
-  const [show, setShow] = useState(false);
+  const [visible, setShow] = useState(false);
+  // the basket bar takes this spot once something is in the basket
+  const { count } = useCart();
+  const show = visible && count === 0;
 
   useEffect(() => {
     const hero = document.getElementById("top");
