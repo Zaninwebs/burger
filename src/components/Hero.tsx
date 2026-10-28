@@ -1,9 +1,10 @@
 import { useEffect, useRef } from "react";
 import { site } from "../data/site";
-import { images } from "../data/images";
+import { images, brand } from "../data/images";
 import { dishCount, formatPrice, findItem } from "../data/menu";
 import { formatSlots, hoursSummary } from "../lib/hours";
 import { useOpenStatus } from "../hooks/useOpenStatus";
+import { LaurelRing, Waves } from "./Ornaments";
 import Icon from "./Icon";
 import "./Hero.css";
 
@@ -19,20 +20,18 @@ const quickLinks = [
 
 export default function Hero() {
   const status = useOpenStatus();
-  const artRef = useRef<HTMLDivElement>(null);
+  const plateRef = useRef<HTMLDivElement>(null);
 
-  // Very light parallax on the food motif — skipped for reduced motion and small screens.
+  // Gentle parallax + tilt of the pizza plate while scrolling (skipped for reduced motion).
   useEffect(() => {
-    const el = artRef.current;
-    if (!el) return;
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce), (max-width: 760px)");
-    if (mq.matches) return;
+    const el = plateRef.current;
+    if (!el || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     let frame = 0;
     const onScroll = () => {
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => {
         const y = Math.min(window.scrollY, window.innerHeight);
-        el.style.setProperty("--parallax", `${y * 0.06}px`);
+        el.style.setProperty("--scroll", String(y / window.innerHeight));
       });
     };
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -43,10 +42,15 @@ export default function Hero() {
   }, []);
 
   return (
-    <section id="top" className="hero on-dark" aria-labelledby="hero-title">
-      <div className="hero__glow" aria-hidden="true" />
+    <section id="top" className="hero" aria-labelledby="hero-title">
+      <div className="hero__sun" aria-hidden="true" />
       <div className="container hero__grid">
         <div className="hero__copy">
+          <figure className="hero__logo">
+            <span className="hero__logo-ring" aria-hidden="true" />
+            <img src={brand.badge.src} alt={brand.badge.alt} width={220} height={220} fetchPriority="high" />
+          </figure>
+
           <p className="eyebrow hero__eyebrow">Grill &amp; Pizzeria · Leichlingen-Witzhelden</p>
           <h1 id="hero-title" className="hero__title display">
             <span className="hero__line"><span>Pizza, Pasta</span></span>
@@ -54,7 +58,7 @@ export default function Hero() {
             <span className="hero__line"><span><em>mitten in Witzhelden.</em></span></span>
           </h1>
           <p className="lead hero__lead">
-            Pizza, Pasta, Döner, Schnitzel und Burger – {dishCount} Gerichte auf einer Karte. Anrufen, bestellen, genießen.
+            {dishCount} Gerichte, von der Margherita bis zum Döner Teller. Anrufen, bestellen, genießen.
           </p>
 
           <div className="hero__ctas">
@@ -62,52 +66,39 @@ export default function Hero() {
               <Icon name="phone" />
               Jetzt bestellen
             </a>
-            <a className="btn btn--ghost btn--lg" href="#speisekarte">
-              Speisekarte entdecken
+            <a className="btn btn--ghost btn--lg" href="/speisekarte/">
+              Speisekarte
               <Icon name="arrow" className="btn-arrow" />
             </a>
           </div>
+
           <nav className="hero__quick" aria-label="Direkt zur Kategorie">
-            {quickLinks.map((q) => (
-              <a key={q.id} href={`#kategorie-${q.id}`}>
+            {quickLinks.map((q, i) => (
+              <a key={q.id} href={`/speisekarte/#kategorie-${q.id}`} style={{ animationDelay: `${1100 + i * 70}ms` }}>
                 {q.label}
               </a>
             ))}
           </nav>
-          <p className="hero__alt">
-            Telefon <a href={site.phoneHref}>{site.phoneDisplay}</a>
-            {site.onlineOrder && (
-              <>
-                {" "}
-                · oder{" "}
-                <a href={site.onlineOrder.url} target="_blank" rel="noopener">
-                  online bei {site.onlineOrder.label}
-                  <span className="sr-only"> (öffnet in neuem Tab)</span>
-                </a>
-              </>
-            )}
-          </p>
         </div>
 
-        <div className="hero__art" ref={artRef}>
-          <div className="hero__arch-outline" aria-hidden="true" />
-          <div className="hero__arch">
+        <div className="hero__art" ref={plateRef}>
+          <LaurelRing className="hero__laurel" />
+          <div className="hero__plate">
             <img
               src={images.pizzaHero.src}
               alt={images.pizzaHero.alt}
               width={images.pizzaHero.width}
               height={images.pizzaHero.height}
-              fetchPriority="high"
               decoding="async"
-              className="hero__pizza"
             />
           </div>
+          <img className="hero__seal" src={brand.badge.src} alt="" width={120} height={120} aria-hidden="true" />
           <p className={`hero__chip hero__chip--status${status?.isOpen ? " is-open" : ""}`}>
             <span className="hero__dot" aria-hidden="true" />
             {status ? status.label : hoursSummary}
           </p>
           <p className="hero__chip hero__chip--price">
-            <span className="hero__chip-label">Pizza · 24, 28 &amp; 32 cm</span>
+            <span className="hero__chip-label">Pizza · 24 / 28 / 32 cm</span>
             <span className="hero__chip-value">ab {formatPrice(cheapestPizza)} €</span>
           </p>
         </div>
@@ -118,7 +109,8 @@ export default function Hero() {
           <li>
             <Icon name="pin" />
             <a href={site.mapsUrl} target="_blank" rel="noopener">
-              {site.address.street}, {site.address.postalCode} {site.address.city}
+              {site.address.street}, {site.address.district}
+              <span className="sr-only"> (Google Maps, öffnet in neuem Tab)</span>
             </a>
           </li>
           <li>
@@ -131,6 +123,8 @@ export default function Hero() {
           </li>
         </ul>
       </div>
+
+      <Waves className="hero__waves" />
     </section>
   );
 }

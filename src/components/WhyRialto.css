@@ -1,7 +1,5 @@
 .why {
-  background:
-    radial-gradient(50% 60% at 0% 0%, rgba(212, 176, 122, 0.07), transparent 70%),
-    var(--olive-950);
+  background: transparent;
   overflow: hidden;
 }
 

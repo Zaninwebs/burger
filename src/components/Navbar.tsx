@@ -5,10 +5,10 @@ import Icon from "./Icon";
 import "./Navbar.css";
 
 const links = [
-  { href: "#highlights", label: "Highlights" },
-  { href: "#speisekarte", label: "Speisekarte" },
-  { href: "#bewertungen", label: "Bewertungen" },
-  { href: "#standort", label: "Öffnungszeiten & Anfahrt" },
+  { href: "/speisekarte/", label: "Speisekarte" },
+  { href: "/#bewertungen", label: "Bewertungen" },
+  { href: "/#bestellen", label: "Bestellen" },
+  { href: "/#standort", label: "Öffnungszeiten & Anfahrt" },
 ];
 
 export default function Navbar() {
@@ -33,7 +33,7 @@ export default function Navbar() {
   return (
     <header className={`nav on-dark${scrolled ? " nav--scrolled" : ""}${open ? " nav--open" : ""}`}>
       <div className="container nav__inner">
-        <a href="#top" className="nav__brand" aria-label={`${site.name} – zur Startseite`} onClick={() => setOpen(false)}>
+        <a href="/" className="nav__brand" aria-label={`${site.name} – zur Startseite`} onClick={() => setOpen(false)}>
           <img src={brand.badge.src} alt="" width={44} height={44} className="nav__badge" />
           <span className="nav__wordmark">
             <span className="nav__name">Rialto</span>
@@ -54,7 +54,7 @@ export default function Navbar() {
             <Icon name="phone" />
             <span>{site.phoneDisplay}</span>
           </a>
-          <a className="btn btn--sm nav__order" href="#bestellen">
+          <a className="btn btn--sm nav__order" href="/#bestellen">
             Bestellen
           </a>
           <button
@@ -85,7 +85,7 @@ export default function Navbar() {
             <a className="btn" href={site.phoneHref}>
               <Icon name="phone" /> {site.phoneDisplay}
             </a>
-            <a className="btn btn--ghost" href="#bestellen" onClick={() => setOpen(false)}>
+            <a className="btn btn--ghost" href="/#bestellen" onClick={() => setOpen(false)}>
               Alle Bestellwege
             </a>
           </div>

@@ -47,7 +47,7 @@ export default function Reviews() {
       <div className="container">
         <header className="reviews__head">
           <div>
-            <p className="eyebrow" data-index="04" data-reveal>
+            <p className="eyebrow" data-index="03" data-reveal>
               Bewertungen
             </p>
             <h2 id="reviews-title" className="section-title" data-reveal>

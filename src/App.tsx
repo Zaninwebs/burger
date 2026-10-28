@@ -1,8 +1,7 @@
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import Marquee from "./components/Marquee";
-import Highlights from "./components/Highlights";
-import Menu from "./components/Menu";
+import Categories from "./components/Categories";
 import WhyRialto from "./components/WhyRialto";
 import Reviews from "./components/Reviews";
 import OrderSection from "./components/OrderSection";
@@ -23,8 +22,7 @@ export default function App() {
       <main id="main">
         <Hero />
         <Marquee />
-        <Highlights />
-        <Menu />
+        <Categories />
         <WhyRialto />
         <Reviews />
         <OrderSection />

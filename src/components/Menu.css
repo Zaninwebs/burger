@@ -1,5 +1,5 @@
 .menu {
-  background: var(--cream);
+  background: transparent;
   padding-bottom: var(--section-y);
   border-top: 1px solid var(--line-light);
 }
@@ -417,4 +417,40 @@ button.menu__chip:not(.is-active):hover {
     radial-gradient(60% 120% at 100% 0%, rgba(194, 54, 30, 0.14), transparent 70%),
     var(--cream-deep);
   border: 1px solid var(--line-dark);
+}
+
+.menu__title {
+  font-size: var(--fs-3xl);
+}
+
+.menu-cat__icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: clamp(72px, 9vw, 104px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--sky);
+  box-shadow: 0 0 0 4px rgba(248, 237, 219, 0.12);
+}
+
+.menu-cat:not([hidden]) .menu-cat__icon {
+  animation: icon-pop 700ms var(--ease-out) both;
+}
+
+.menu-cat__icon .food-icon {
+  width: 74%;
+  height: 74%;
+}
+
+@keyframes icon-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.6) rotate(-20deg);
+  }
+}
+
+.menu-page .menu {
+  padding-top: calc(var(--nav-h) + clamp(2rem, 1.5rem + 3vw, 4rem));
+  border-top: 0;
 }

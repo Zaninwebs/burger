@@ -17,7 +17,7 @@ export default function MobileActionBar() {
           <span className="sr-only"> bestellen bei {site.onlineOrder.label} (öffnet in neuem Tab)</span>
         </a>
       ) : (
-        <a className="actionbar__btn" href="#speisekarte">
+        <a className="actionbar__btn" href="/speisekarte/">
           <Icon name="book" />
           Karte
         </a>

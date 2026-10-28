@@ -1,13 +1,13 @@
 # Rialto Grill & Pizzeria — Website
 
 Website für **Rialto Grill & Pizzeria**, Hauptstraße 19, 42799 Leichlingen-Witzhelden.
-Designrichtung: „Premium Food Editorial“: dunkles Olivgrün, warmes Creme, Tomatenrot als Akzent.
-Das Rundbogen-Motiv ist von der Rialtobrücke im Logo abgeleitet.
+Designrichtung „Laguna“: Farben und Motive stammen aus dem Logo — Verlauf von warmem
+Taupe zu Schiefer, Himmel-Creme, Terrakotta, Lagunenblau, Lorbeer und animierte Wellen.
 
 ## Stack
 
-- React 19 + TypeScript, Vite (Multi-Page: `/`, `/impressum/`, `/datenschutz/`)
-- **Prerendering:** `npm run build` rendert die Startseite serverseitig in `dist/index.html`
+- React 19 + TypeScript, Vite (Multi-Page: `/`, `/speisekarte/`, `/impressum/`, `/datenschutz/`)
+- **Prerendering:** `npm run build` rendert Startseite und Speisekarte serverseitig vor
   (`src/entry-server.tsx` + `scripts/prerender.mjs`). Speisekarte, Preise und Adresse stehen
   damit ohne JavaScript im HTML, gut für SEO und schnell beim ersten Laden.
 - Animationen ausschließlich mit CSS + einem gemeinsamen IntersectionObserver (`src/hooks/useReveal.ts`).
@@ -30,7 +30,9 @@ npm run preview  # Produktions-Build lokal ansehen
 | --- | --- |
 | Name, Telefon, Adresse, Links, Online-Bestellung, Öffnungszeiten | `src/data/site.ts` |
 | Speisekarte (1:1 aus der gedruckten Karte) | `src/data/menu.ts` |
-| Bilder (zentral, austauschbar) | `src/data/images.ts` + `public/images/` |
+| Hero-Foto + Logo | `src/data/images.ts` + `public/images/` |
+| Kategorie-Illustrationen (Logo-Stil) | `src/components/FoodIcon.tsx` |
+| Startseite / Speisekarte | `src/App.tsx` / `src/MenuApp.tsx` (`/speisekarte/`) |
 | Bewertungen + Google-Rating | `src/data/reviews.ts` |
 | SEO-Meta, JSON-LD | `index.html` |
 | Impressum / Datenschutz | `impressum/index.html`, `datenschutz/index.html` |
@@ -55,14 +57,13 @@ Diese Punkte konnten nicht sicher verifiziert werden und müssen vom Betreiber b
    Für einen direkten „Bewertung schreiben“-Link wird die Google Place-ID benötigt.
 6. **Allergene/Zusatzstoffe.** Die Kennzeichnungen der gedruckten Karte (A, C, G, 1, 4 …) wurden nicht
    übernommen, weil die Legende fehlte. Mit Legende können sie in `menu.ts` ergänzt werden.
-7. **Fotos.** Die aktuellen Food-Fotos sind aus der gedruckten Speisekarte ausgeschnitten
-   (niedrige Auflösung). Die Nutzungsrechte bitte beim Ersteller der Karte bestätigen.
-   Empfehlung: ein professionelles Food-Shooting, danach Dateien in `public/images/food/` ersetzen
-   und `src/data/images.ts` anpassen.
+7. **Fotos.** Nur das Hero-Pizzafoto stammt aus der gedruckten Speisekarte (4x hochskaliert);
+   die übrigen Fotos waren zu schlecht und wurden durch Illustrationen ersetzt. Nutzungsrechte
+   des Pizzafotos bitte bestätigen. Für echte Food-Fotos: professionelles Shooting.
 8. **Social Media.** Nur echte Profile in `site.social` eintragen.
 
 ## Google-Unternehmensprofil (Empfehlungen)
 
 - Öffnungszeiten, Website-URL und Telefonnummer identisch zur Website pflegen.
-- Speisekarten-Link auf `https://www.rialto-pizzeria.com/#speisekarte` setzen.
+- Speisekarten-Link auf `https://www.rialto-pizzeria.com/speisekarte/` setzen.
 - Aktuelle Fotos hochladen und auf Bewertungen antworten.

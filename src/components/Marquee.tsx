@@ -8,7 +8,7 @@ export default function Marquee() {
     <ul className="marquee__row" aria-hidden={hidden || undefined}>
       {words.map((w) => (
         <li key={w}>
-          <a href={`#kategorie-${menu.find((c) => c.title === w)!.id}`} tabIndex={hidden ? -1 : undefined}>
+          <a href={`/speisekarte/#kategorie-${menu.find((c) => c.title === w)!.id}`} tabIndex={hidden ? -1 : undefined}>
             {w}
           </a>
         </li>

@@ -13,7 +13,7 @@ export default function Location() {
     <section id="standort" className="section location" aria-labelledby="location-title">
       <div className="container location__grid">
         <div className="location__info">
-          <p className="eyebrow" data-index="06" data-reveal>
+          <p className="eyebrow" data-index="05" data-reveal>
             Standort &amp; Öffnungszeiten
           </p>
           <h2 id="location-title" className="section-title" data-reveal>

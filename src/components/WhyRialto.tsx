@@ -34,7 +34,7 @@ export default function WhyRialto() {
     <section className="section why on-dark" aria-labelledby="why-title">
       <div className="container why__grid">
         <div className="why__intro">
-          <p className="eyebrow" data-index="03" data-reveal>
+          <p className="eyebrow" data-index="02" data-reveal>
             Warum Rialto?
           </p>
           <h2 id="why-title" className="section-title" data-reveal>
@@ -70,7 +70,7 @@ export default function WhyRialto() {
             <ul className="why__local-list">
               {localPizzas.map((p) => (
                 <li key={p!.no}>
-                  <a href="#kategorie-pizza">
+                  <a href="/speisekarte/#kategorie-pizza">
                     <span>{p!.name}</span>
                     <span className="why__local-desc">{p!.desc}</span>
                   </a>

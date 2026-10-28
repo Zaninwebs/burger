@@ -53,16 +53,16 @@ export default function Footer() {
           <h2 className="footer__heading">Navigation</h2>
           <ul className="footer__list">
             <li>
-              <a href="#speisekarte">Speisekarte</a>
+              <a href="/speisekarte/">Speisekarte</a>
             </li>
             <li>
-              <a href="#bestellen">Bestellen</a>
+              <a href="/#bestellen">Bestellen</a>
             </li>
             <li>
-              <a href="#bewertungen">Bewertungen</a>
+              <a href="/#bewertungen">Bewertungen</a>
             </li>
             <li>
-              <a href="#standort">Anfahrt</a>
+              <a href="/#standort">Anfahrt</a>
             </li>
             {site.social.map((s) => (
               <li key={s.url}>

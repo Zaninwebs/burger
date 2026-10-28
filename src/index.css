@@ -3,39 +3,49 @@
 @import "@fontsource-variable/hanken-grotesk/index.css";
 
 /* ==========================================================================
-   Design tokens — Rialto "Premium Food Editorial"
+   Design tokens — Rialto "Laguna": colours taken from the logo
+   (taupe-to-slate background, sky cream, terracotta, laguna blue, laurel)
    ========================================================================== */
 :root {
   /* Surfaces */
-  --olive-950: #0b0c09;
-  --olive-900: #0b0c09;
-  --olive-800: #171913;
-  --olive-700: #262920;
-  --cream: #0b0c09;
-  --cream-deep: #171913;
+  --olive-950: #1f2125;
+  --olive-900: #26282c;
+  --olive-800: #303136;
+  --olive-700: #3c3d42;
+  --cream: #1f2125;
+  --cream-deep: rgba(248, 237, 219, 0.06);
   /* Food tiles: photos are transparent cut-outs and float on this surface. */
-  --paper: #131510;
+  --paper: rgba(248, 237, 219, 0.05);
 
   /* Ink */
-  --ink: #f4eee0;
-  --ink-soft: #bdb7a6;
-  --ink-faint: #918d7e;
-  --on-dark: #f4eee0;
-  --on-dark-soft: #bdb7a6;
-  --on-dark-faint: #8c8878;
+  --ink: #f8eddb;
+  --ink-soft: #e2d6c3;
+  --ink-faint: #cdbfab;
+  --on-dark: #f8eddb;
+  --on-dark-soft: #e2d6c3;
+  --on-dark-faint: #cdbfab;
 
   /* Accents */
-  --tomato: #c2361e;
-  --tomato-hover: #a82c17;
-  --tomato-soft: rgba(194, 54, 30, 0.3);
+  --tomato: #b04a2a;
+  --tomato-hover: #973c20;
+  --tomato-soft: rgba(210, 153, 124, 0.35);
   /* Tomato tuned for text on black (AA contrast). */
-  --tomato-text: #ec6a4f;
-  --gold: #d4b07a;
-  --gold-deep: #d4b07a;
-  --laguna: #9fbccb;
+  --tomato-text: #f3b08f;
+  --gold: #f2c9a3;
+  --gold-deep: #f2c9a3;
+  --laguna: #b2d1d6;
+  --laguna-deep: #6f98a3;
+  --sage: #b9cfa3;
+  --terracotta: #d2997c;
+  --sky: #f8eddb;
+  --rialto-blue: #4a5a80;
+  /* Background gradient from the logo: warm taupe at the top, slate below */
+  --bg-top: #5d524b;
+  --bg-mid: #3a3836;
+  --bg-bottom: #1f2125;
 
-  --line-light: rgba(244, 238, 224, 0.12);
-  --line-dark: rgba(244, 238, 224, 0.12);
+  --line-light: rgba(248, 237, 219, 0.14);
+  --line-dark: rgba(248, 237, 219, 0.14);
 
   /* Typography */
   --font-display: "Fraunces Variable", "Iowan Old Style", Georgia, serif;
@@ -111,7 +121,7 @@ html {
 
 body {
   margin: 0;
-  background: var(--cream);
+  background: var(--bg-bottom);
   color: var(--ink);
   font-family: var(--font-sans);
   font-size: var(--fs-base);
@@ -122,7 +132,20 @@ body {
   padding-bottom: var(--actionbar-h);
 }
 
-/* Fine film grain over the black canvas — adds depth without weight. */
+/* The logo's gradient as one continuous backdrop behind every section */
+html {
+  background: var(--bg-bottom);
+}
+
+body {
+  background:
+    radial-gradient(90% 60% at 80% 0%, rgba(210, 153, 124, 0.22), transparent 60%),
+    radial-gradient(70% 40% at 0% 30%, rgba(178, 209, 214, 0.08), transparent 70%),
+    linear-gradient(180deg, var(--bg-top) 0, var(--bg-mid) 1100px, var(--bg-bottom) 2400px) no-repeat,
+    var(--bg-bottom);
+}
+
+/* Fine film grain over the canvas — adds depth without weight. */
 body::after {
   content: "";
   position: fixed;
@@ -423,37 +446,6 @@ main > .section {
 }
 
 /* ==========================================================================
-   Food tile — photo on menu paper
-   ========================================================================== */
-.food-tile {
-  background:
-    radial-gradient(60% 55% at 50% 58%, rgba(212, 176, 122, 0.13), transparent 72%),
-    var(--paper);
-  border: 1px solid rgba(244, 238, 224, 0.06);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  display: grid;
-  place-items: center;
-  position: relative;
-}
-
-.food-tile img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  filter: drop-shadow(0 18px 28px rgba(0, 0, 0, 0.55));
-}
-
-/* Photos whose source is cut off at the bottom sit flush on the tile edge. */
-.food-tile--flush-bottom {
-  padding-bottom: 0 !important;
-}
-
-.food-tile--flush-bottom img {
-  object-position: center bottom;
-}
-
-/* ==========================================================================
    Scroll reveal (progressive enhancement: only hidden once JS is ready)
    ========================================================================== */
 .js [data-reveal] {
@@ -506,19 +498,6 @@ main > .section {
     transform: none;
     clip-path: none;
   }
-}
-
-/* Gold edge on interactive food tiles */
-.food-tile {
-  transition:
-    border-color var(--dur-base) var(--ease-out),
-    box-shadow var(--dur-base) var(--ease-out);
-}
-
-a:hover > .food-tile,
-a:focus-visible > .food-tile {
-  border-color: rgba(212, 176, 122, 0.45);
-  box-shadow: 0 30px 60px -30px rgba(212, 176, 122, 0.25);
 }
 
 /* Reading progress — pure CSS scroll-driven animation where supported */

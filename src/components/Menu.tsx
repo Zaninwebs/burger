@@ -1,19 +1,19 @@
 import { useDeferredValue, useEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent } from "react";
 import { menu, formatPrice, type MenuCategory, type MenuItem } from "../data/menu";
-import { images, type SiteImage } from "../data/images";
 import { site } from "../data/site";
 import Icon from "./Icon";
+import FoodIcon, { type FoodIconName } from "./FoodIcon";
 import "./Menu.css";
 
-const categoryImages: Partial<Record<string, SiteImage>> = {
-  pizza: images.pizzaGarnelen,
-  pizzabroetchen: images.pizzabroetchen,
-  pasta: images.spaghetti,
-  doener: images.doenerTasche,
-  falafel: images.falafel,
-  schnitzel: images.schnitzel,
-  burger: images.burger,
-  "nuggets-wings": images.nuggets,
+const categoryIcons: Partial<Record<string, FoodIconName>> = {
+  pizza: "pizza",
+  pizzabroetchen: "pizzabroetchen",
+  pasta: "pasta",
+  doener: "doener",
+  schnitzel: "schnitzel",
+  burger: "burger",
+  auflaeufe: "auflaeufe",
+  salate: "salate",
 };
 
 const normalize = (s: string) =>
@@ -119,12 +119,12 @@ export default function Menu() {
     <section id="speisekarte" className="section menu" aria-labelledby="menu-title">
       <div className="container">
         <header className="menu__head">
-          <p className="eyebrow" data-index="02" data-reveal>
+          <p className="eyebrow" data-reveal>
             Speisekarte
           </p>
-          <h2 id="menu-title" className="section-title" data-reveal>
+          <h1 id="menu-title" className="section-title menu__title" data-reveal>
             Kategorie wählen. <em>Nummer nennen.</em>
-          </h2>
+          </h1>
           <p className="lead menu__lead" data-reveal>
             Tippen Sie auf eine Kategorie oder suchen Sie nach Gericht, Zutat oder Nummer.
           </p>
@@ -199,7 +199,7 @@ export default function Menu() {
           <CategoryBlock
             key={c.id}
             category={c}
-            image={searching ? undefined : categoryImages[c.id]}
+            icon={searching ? undefined : categoryIcons[c.id]}
             hidden={!searching && c.id !== active}
             asTabPanel={!searching}
           />
@@ -233,12 +233,12 @@ export default function Menu() {
 
 function CategoryBlock({
   category,
-  image,
+  icon,
   hidden,
   asTabPanel,
 }: {
   category: MenuCategory;
-  image?: SiteImage;
+  icon?: FoodIconName;
   hidden: boolean;
   asTabPanel: boolean;
 }) {
@@ -247,7 +247,7 @@ function CategoryBlock({
   return (
     <section
       id={`kategorie-${category.id}`}
-      className={`menu-cat${image ? " menu-cat--with-image" : ""}`}
+      className="menu-cat"
       role={asTabPanel ? "tabpanel" : undefined}
       aria-labelledby={asTabPanel ? `tab-${category.id}` : `cat-${category.id}`}
       hidden={hidden}
@@ -260,10 +260,10 @@ function CategoryBlock({
           </h3>
           {category.note && <p className="menu-cat__note">{category.note}</p>}
         </div>
-        {image && (
-          <div className={`food-tile menu-cat__image${image.flushBottom ? " food-tile--flush-bottom" : ""}`}>
-            <img src={image.src} alt="" width={image.width} height={image.height} loading="lazy" decoding="async" />
-          </div>
+        {icon && (
+          <span className="menu-cat__icon">
+            <FoodIcon name={icon} />
+          </span>
         )}
       </header>
 

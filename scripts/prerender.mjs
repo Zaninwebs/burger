@@ -7,9 +7,14 @@ import path from "node:path";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const { render } = await import(pathToFileURL(path.join(root, "dist-ssr/entry-server.js")).href);
 
-const file = path.join(root, "dist/index.html");
-const html = await readFile(file, "utf8");
-if (!html.includes("<!--app-html-->")) throw new Error("Placeholder <!--app-html--> missing in dist/index.html");
-await writeFile(file, html.replace("<!--app-html-->", render()));
+for (const [page, rel] of [
+  ["home", "dist/index.html"],
+  ["speisekarte", "dist/speisekarte/index.html"],
+]) {
+  const file = path.join(root, rel);
+  const html = await readFile(file, "utf8");
+  if (!html.includes("<!--app-html-->")) throw new Error(`Placeholder <!--app-html--> missing in ${rel}`);
+  await writeFile(file, html.replace("<!--app-html-->", render(page)));
+}
 await rm(path.join(root, "dist-ssr"), { recursive: true, force: true });
-console.log("prerendered dist/index.html");
+console.log("prerendered dist/index.html, dist/speisekarte/index.html");
