@@ -1,13 +1,14 @@
 import type { CSSProperties } from "react";
 import { dishCount, findItem } from "../data/menu";
 import { brand } from "../data/images";
+import CountUp from "./CountUp";
 import "./WhyRialto.css";
 
 const localPizzas = ["37", "37c", "37a", "37b"].map((no) => findItem(no)).filter(Boolean);
 
 const facts = [
   {
-    figure: String(dishCount),
+    figure: dishCount,
     label: "Gerichte auf der Karte",
     text: "Pizza und Pasta, Döner und Falafel, Schnitzel, Burger, Aufläufe, Baguettes und Salate – für jeden am Tisch etwas dabei.",
   },
@@ -54,7 +55,7 @@ export default function WhyRialto() {
           <ol className="why__facts">
             {facts.map((f, idx) => (
               <li key={f.label} className="why__fact" data-reveal style={{ "--reveal-delay": idx * 80 } as CSSProperties}>
-                <p className="why__figure">{f.figure}</p>
+                <p className="why__figure">{typeof f.figure === "number" ? <CountUp value={f.figure} /> : f.figure}</p>
                 <div>
                   <h3 className="why__label">{f.label}</h3>
                   <p className="why__text">{f.text}</p>

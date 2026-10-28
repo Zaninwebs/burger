@@ -368,3 +368,53 @@
     scroll-margin-top: calc(var(--nav-h) + 124px);
   }
 }
+
+/* Tabs */
+button.menu__chip {
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+button.menu__chip:not(.is-active):hover {
+  border-color: var(--line-light);
+}
+
+.menu-cat[role="tabpanel"] {
+  padding-top: clamp(2rem, 1.5rem + 2vw, 3rem);
+}
+
+.menu-cat[role="tabpanel"]:focus-visible {
+  outline-offset: 8px;
+}
+
+/* Items cascade in whenever a panel becomes visible */
+.menu-cat:not([hidden]) .menu-cat__head {
+  animation: panel-in 600ms var(--ease-out) both;
+}
+
+.menu-cat:not([hidden]) .menu-item {
+  animation: item-in 650ms var(--ease-out) both;
+  animation-delay: calc(min(var(--i, 0), 14) * 35ms + 80ms);
+}
+
+@keyframes panel-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 12px, 0);
+  }
+}
+
+@keyframes item-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 16px, 0);
+  }
+}
+
+.menu__order {
+  background:
+    radial-gradient(60% 120% at 100% 0%, rgba(194, 54, 30, 0.14), transparent 70%),
+    var(--cream-deep);
+  border: 1px solid var(--line-dark);
+}

@@ -520,3 +520,61 @@ a:focus-visible > .food-tile {
   border-color: rgba(212, 176, 122, 0.45);
   box-shadow: 0 30px 60px -30px rgba(212, 176, 122, 0.25);
 }
+
+/* Reading progress — pure CSS scroll-driven animation where supported */
+@supports (animation-timeline: scroll()) {
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0 0 auto;
+    height: 2px;
+    z-index: 60;
+    background: linear-gradient(90deg, var(--gold), var(--tomato));
+    transform-origin: 0 50%;
+    transform: scaleX(0);
+    animation: progress linear both;
+    animation-timeline: scroll(root);
+    pointer-events: none;
+  }
+
+  @keyframes progress {
+    to {
+      transform: scaleX(1);
+    }
+  }
+}
+
+/* A soft light sweep draws the eye to the main call to action */
+.btn--sheen {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.btn--sheen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, 0.35) 50%, transparent 70%);
+  transform: translateX(-120%);
+  animation: sheen 5s var(--ease-in-out) 2.4s infinite;
+}
+
+@keyframes sheen {
+  0%,
+  70% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(120%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn--sheen::after,
+  body::before {
+    animation: none;
+    display: none;
+  }
+}

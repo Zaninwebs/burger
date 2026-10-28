@@ -6,7 +6,7 @@ import "./MobileActionBar.css";
 export default function MobileActionBar() {
   return (
     <div className="actionbar" role="region" aria-label="Schnellaktionen">
-      <a className="actionbar__btn actionbar__btn--primary" href={site.phoneHref}>
+      <a className="actionbar__btn actionbar__btn--primary btn--sheen" href={site.phoneHref}>
         <Icon name="phone" />
         Anrufen &amp; bestellen
       </a>

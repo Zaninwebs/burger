@@ -9,6 +9,14 @@ import "./Hero.css";
 
 const cheapestPizza = findItem("01")?.prices[0] ?? 0;
 
+const quickLinks = [
+  { id: "pizza", label: "Pizza" },
+  { id: "doener", label: "Döner" },
+  { id: "burger", label: "Burger" },
+  { id: "pasta", label: "Pasta" },
+  { id: "schnitzel", label: "Schnitzel" },
+];
+
 export default function Hero() {
   const status = useOpenStatus();
   const artRef = useRef<HTMLDivElement>(null);
@@ -46,20 +54,26 @@ export default function Hero() {
             <span className="hero__line"><span><em>mitten in Witzhelden.</em></span></span>
           </h1>
           <p className="lead hero__lead">
-            {dishCount} Gerichte auf einer Karte: Pizza in drei Größen, Pasta, Döner, Schnitzel, Burger und Aufläufe.
-            Anrufen, bestellen, genießen.
+            Pizza, Pasta, Döner, Schnitzel und Burger – {dishCount} Gerichte auf einer Karte. Anrufen, bestellen, genießen.
           </p>
 
           <div className="hero__ctas">
-            <a className="btn" href={site.phoneHref}>
+            <a className="btn btn--lg btn--sheen" href={site.phoneHref}>
               <Icon name="phone" />
               Jetzt bestellen
             </a>
-            <a className="btn btn--ghost" href="#speisekarte">
+            <a className="btn btn--ghost btn--lg" href="#speisekarte">
               Speisekarte entdecken
               <Icon name="arrow" className="btn-arrow" />
             </a>
           </div>
+          <nav className="hero__quick" aria-label="Direkt zur Kategorie">
+            {quickLinks.map((q) => (
+              <a key={q.id} href={`#kategorie-${q.id}`}>
+                {q.label}
+              </a>
+            ))}
+          </nav>
           <p className="hero__alt">
             Telefon <a href={site.phoneHref}>{site.phoneDisplay}</a>
             {site.onlineOrder && (

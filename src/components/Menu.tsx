@@ -1,4 +1,4 @@
-import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
+import { useDeferredValue, useEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent } from "react";
 import { menu, formatPrice, type MenuCategory, type MenuItem } from "../data/menu";
 import { images, type SiteImage } from "../data/images";
 import { site } from "../data/site";
@@ -44,39 +44,56 @@ function filterMenu(query: string): MenuCategory[] {
 export default function Menu() {
   const [query, setQuery] = useState("");
   const deferredQuery = useDeferredValue(query);
+  const searching = deferredQuery.trim().length > 0;
   const categories = useMemo(() => filterMenu(deferredQuery), [deferredQuery]);
   const resultCount = categories.reduce((n, c) => n + c.sections.reduce((m, s) => m + s.items.length, 0), 0);
   const [active, setActive] = useState(menu[0].id);
   const barRef = useRef<HTMLDivElement>(null);
+  const panelsRef = useRef<HTMLDivElement>(null);
 
-  // Scroll spy: the active category is the last one whose top has passed the sticky toolbar.
+  /** Scroll so the active panel starts right below the sticky nav + toolbar. */
+  const revealPanels = (force = false) => {
+    const panels = panelsRef.current;
+    const bar = barRef.current?.closest<HTMLElement>(".menu__toolbar");
+    if (!panels || !bar) return;
+    const navHeight = document.querySelector<HTMLElement>(".nav")?.offsetHeight ?? 0;
+    const stuckBottom = navHeight + bar.offsetHeight;
+    const top = panels.getBoundingClientRect().top;
+    if (force || top < stuckBottom) {
+      const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      window.scrollTo({ top: window.scrollY + top - stuckBottom - 8, behavior: reduced ? "auto" : "smooth" });
+    }
+  };
+
+  const selectCategory = (id: string, scroll = true) => {
+    setQuery("");
+    setActive(id);
+    if (scroll) requestAnimationFrame(() => revealPanels());
+  };
+
+  // Links like "#kategorie-burger" anywhere on the page open the matching tab.
   useEffect(() => {
-    let frame = 0;
-    const update = () => {
-      const sections = document.querySelectorAll<HTMLElement>("[data-menu-category]");
-      const line = (barRef.current?.getBoundingClientRect().bottom ?? 0) + 48;
-      let current = sections[0]?.dataset.menuCategory;
-      for (const s of sections) {
-        if (s.getBoundingClientRect().top <= line) current = s.dataset.menuCategory;
-        else break;
+    const open = (id: string) => {
+      if (!menu.some((c) => c.id === id)) return false;
+      setQuery("");
+      setActive(id);
+      requestAnimationFrame(() => revealPanels(true));
+      return true;
+    };
+    const onClick = (e: MouseEvent) => {
+      const link = (e.target as HTMLElement | null)?.closest<HTMLAnchorElement>('a[href^="#kategorie-"]');
+      if (!link || e.defaultPrevented || e.metaKey || e.ctrlKey) return;
+      if (open(link.getAttribute("href")!.slice("#kategorie-".length))) {
+        e.preventDefault();
+        history.replaceState(null, "", "#speisekarte");
       }
-      if (current) setActive(current);
     };
-    const onScroll = () => {
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(update);
-    };
-    update();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
-    return () => {
-      cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
-    };
-  }, [categories]);
+    if (location.hash.startsWith("#kategorie-")) open(location.hash.slice("#kategorie-".length));
+    document.addEventListener("click", onClick);
+    return () => document.removeEventListener("click", onClick);
+  }, []);
 
-  // Keep the active chip visible inside the horizontal bar without moving the page.
+  // Keep the active tab visible inside the horizontal bar without moving the page.
   useEffect(() => {
     const bar = barRef.current;
     const chip = bar?.querySelector<HTMLElement>(`[data-chip="${active}"]`);
@@ -84,6 +101,19 @@ export default function Menu() {
     const left = chip.offsetLeft - bar.clientWidth / 2 + chip.clientWidth / 2;
     bar.scrollTo({ left, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
   }, [active]);
+
+  // WAI-ARIA tabs: arrow keys move between tabs, Home/End jump to the ends.
+  const onTabKey = (e: KeyboardEvent<HTMLButtonElement>, index: number) => {
+    const keys: Record<string, number> = { ArrowRight: 1, ArrowLeft: -1 };
+    let next = -1;
+    if (e.key in keys) next = (index + keys[e.key] + menu.length) % menu.length;
+    if (e.key === "Home") next = 0;
+    if (e.key === "End") next = menu.length - 1;
+    if (next < 0) return;
+    e.preventDefault();
+    selectCategory(menu[next].id, false);
+    barRef.current?.querySelector<HTMLButtonElement>(`[data-chip="${menu[next].id}"]`)?.focus();
+  };
 
   return (
     <section id="speisekarte" className="section menu" aria-labelledby="menu-title">
@@ -93,15 +123,15 @@ export default function Menu() {
             Speisekarte
           </p>
           <h2 id="menu-title" className="section-title" data-reveal>
-            Unsere ganze Karte. <em>Ein Anruf genügt.</em>
+            Kategorie wählen. <em>Nummer nennen.</em>
           </h2>
           <p className="lead menu__lead" data-reveal>
-            Suchen Sie nach Gericht, Zutat oder Nummer – und nennen Sie beim Bestellen einfach die Nummer.
+            Tippen Sie auf eine Kategorie oder suchen Sie nach Gericht, Zutat oder Nummer.
           </p>
         </header>
       </div>
 
-      <div className="menu__toolbar">
+      <div className="menu__toolbar" id="speisekarte-tabs">
         <div className="container menu__toolbar-inner">
           <div className="menu__search">
             <Icon name="search" />
@@ -123,28 +153,37 @@ export default function Menu() {
               </button>
             )}
           </div>
-          <nav className="menu__chips" aria-label="Kategorien der Speisekarte" ref={barRef}>
-            {categories.map((c) => (
-              <a
-                key={c.id}
-                href={`#kategorie-${c.id}`}
-                data-chip={c.id}
-                className={`menu__chip${active === c.id ? " is-active" : ""}`}
-                aria-current={active === c.id ? "true" : undefined}
-              >
-                {c.title}
-              </a>
-            ))}
-          </nav>
+          <div className="menu__chips" role="tablist" aria-label="Kategorien der Speisekarte" ref={barRef}>
+            {menu.map((c, idx) => {
+              const selected = !searching && active === c.id;
+              return (
+                <button
+                  key={c.id}
+                  type="button"
+                  role="tab"
+                  id={`tab-${c.id}`}
+                  data-chip={c.id}
+                  aria-selected={selected}
+                  aria-controls={`kategorie-${c.id}`}
+                  tabIndex={selected || (searching && idx === 0) ? 0 : -1}
+                  className={`menu__chip${selected ? " is-active" : ""}`}
+                  onClick={() => selectCategory(c.id)}
+                  onKeyDown={(e) => onTabKey(e, idx)}
+                >
+                  {c.title}
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
 
-      <div className="container">
+      <div className="container" ref={panelsRef}>
         <p className="sr-only" role="status" aria-live="polite">
-          {deferredQuery ? `${resultCount} Treffer für „${deferredQuery}“` : ""}
+          {searching ? `${resultCount} Treffer für „${deferredQuery}“` : ""}
         </p>
 
-        {categories.length === 0 && (
+        {searching && categories.length === 0 && (
           <div className="menu__empty">
             <p className="menu__empty-title">Keine Treffer für „{deferredQuery}“.</p>
             <p>
@@ -156,11 +195,17 @@ export default function Menu() {
           </div>
         )}
 
-        {categories.map((c) => (
-          <CategoryBlock key={c.id} category={c} image={deferredQuery ? undefined : categoryImages[c.id]} />
+        {(searching ? categories : menu).map((c) => (
+          <CategoryBlock
+            key={c.id}
+            category={c}
+            image={searching ? undefined : categoryImages[c.id]}
+            hidden={!searching && c.id !== active}
+            asTabPanel={!searching}
+          />
         ))}
 
-        <aside className="menu__order on-dark" aria-label="Bestellen">
+        <aside className="menu__order" aria-label="Bestellen">
           <div>
             <p className="menu__order-title">Etwas gefunden?</p>
             <p className="menu__order-text">Rufen Sie an und nennen Sie die Nummer Ihres Gerichts – bei Pizza auch die Größe.</p>
@@ -186,14 +231,27 @@ export default function Menu() {
   );
 }
 
-function CategoryBlock({ category, image }: { category: MenuCategory; image?: SiteImage }) {
+function CategoryBlock({
+  category,
+  image,
+  hidden,
+  asTabPanel,
+}: {
+  category: MenuCategory;
+  image?: SiteImage;
+  hidden: boolean;
+  asTabPanel: boolean;
+}) {
+  let itemIndex = 0;
   const labels = category.priceLabels;
   return (
     <section
       id={`kategorie-${category.id}`}
-      data-menu-category={category.id}
       className={`menu-cat${image ? " menu-cat--with-image" : ""}`}
-      aria-labelledby={`cat-${category.id}`}
+      role={asTabPanel ? "tabpanel" : undefined}
+      aria-labelledby={asTabPanel ? `tab-${category.id}` : `cat-${category.id}`}
+      hidden={hidden}
+      tabIndex={asTabPanel ? 0 : undefined}
     >
       <header className="menu-cat__head">
         <div className="menu-cat__titles">
@@ -221,7 +279,7 @@ function CategoryBlock({ category, image }: { category: MenuCategory; image?: Si
           )}
           <ul className="menu-list">
             {section.items.map((item, i) => (
-              <li className="menu-item" key={`${item.no}-${i}`}>
+              <li className="menu-item" key={`${item.no}-${i}`} style={{ "--i": itemIndex++ } as CSSProperties}>
                 {item.no && <span className="menu-item__no">{item.no}</span>}
                 <div className="menu-item__text">
                   <p className="menu-item__name">
