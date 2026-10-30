@@ -26,6 +26,12 @@ export const images = {
   pizzaHero: img("pizza-gemuese-oliven", "Pizza mit Oliven, Zwiebeln, Tomaten und Paprika auf einem Holzbrett", 1400, 1138),
 } satisfies Record<string, SiteImage>;
 
+/**
+ * Category photos generated with Higgsfield (GPT Image) as serving suggestions.
+ * A category without an entry falls back to its illustration.
+ */
+export const categoryPhotos: Partial<Record<string, SiteImage>> = {};
+
 export const brand = {
   badge: { src: "/images/brand/rialto-logo-badge.webp", alt: "Rialto Grill Pizzeria Logo", width: 640, height: 640 },
 };

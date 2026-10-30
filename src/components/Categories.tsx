@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import { menu, formatPrice } from "../data/menu";
+import { categoryPhotos } from "../data/images";
 import FoodIcon, { type FoodIconName } from "./FoodIcon";
 import Icon from "./Icon";
 import "./Categories.css";
@@ -23,6 +24,12 @@ const stats = (id: string) => {
 };
 
 export default function Categories() {
+  // With photos, show only the photographed categories plus an "all" tile (6 tiles, 2×3 on phones).
+  const withPhotos = shown.filter((c) => categoryPhotos[c.id]);
+  const photoMode = withPhotos.length >= 4;
+  const list = photoMode ? withPhotos : shown;
+  const totalCategories = menu.filter((c) => c.id !== "getraenke").length;
+
   return (
     <section id="kategorien" className="section categories" aria-labelledby="categories-title">
       <div className="container">
@@ -36,14 +43,21 @@ export default function Categories() {
         </header>
 
         <ul className="categories__grid">
-          {shown.map((c, idx) => {
+          {list.map((c, idx) => {
             const s = stats(c.id);
+            const photo = categoryPhotos[c.id];
             return (
               <li key={c.id} data-reveal style={{ "--reveal-delay": (idx % 4) * 80 } as CSSProperties}>
-                <a className="cat-card" href={`/speisekarte/#kategorie-${c.id}`}>
-                  <span className="cat-card__icon">
-                    <FoodIcon name={c.icon} />
-                  </span>
+                <a className={`cat-card${photo ? " cat-card--photo" : ""}`} href={`/speisekarte/#kategorie-${c.id}`}>
+                  {photo ? (
+                    <span className="cat-card__photo">
+                      <img src={photo.src} alt="" width={photo.width} height={photo.height} loading="lazy" decoding="async" />
+                    </span>
+                  ) : (
+                    <span className="cat-card__icon">
+                      <FoodIcon name={c.icon} />
+                    </span>
+                  )}
                   <span className="cat-card__title">{s.title}</span>
                   <span className="cat-card__meta">
                     <span>{s.count} Gerichte</span>
@@ -56,6 +70,23 @@ export default function Categories() {
               </li>
             );
           })}
+          {photoMode && (
+            <li data-reveal style={{ "--reveal-delay": (list.length % 4) * 80 } as CSSProperties}>
+              <a className="cat-card cat-card--all" href="/speisekarte/">
+                <span className="cat-card__icon">
+                  <FoodIcon name="oven" />
+                </span>
+                <span className="cat-card__title">Ganze Speisekarte</span>
+                <span className="cat-card__meta">
+                  <span>{totalCategories} Kategorien</span>
+                  <span className="cat-card__price">alle Preise</span>
+                </span>
+                <span className="cat-card__arrow" aria-hidden="true">
+                  <Icon name="arrow" />
+                </span>
+              </a>
+            </li>
+          )}
         </ul>
 
         <div className="categories__all" data-reveal>

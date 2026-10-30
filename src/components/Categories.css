@@ -182,3 +182,54 @@
     display: none;
   }
 }
+
+/* Photo variant: the dish fills the top of the card */
+.cat-card--photo {
+  padding: 0 0 var(--s-5);
+}
+
+.cat-card__photo {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  margin-bottom: var(--s-1);
+}
+
+.cat-card__photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.02);
+  transition: transform 900ms var(--ease-out);
+}
+
+.cat-card--photo:hover .cat-card__photo img,
+.cat-card--photo:focus-visible .cat-card__photo img {
+  transform: scale(1.09);
+}
+
+.cat-card--photo .cat-card__title,
+.cat-card--photo .cat-card__meta,
+.cat-card--photo .cat-card__arrow {
+  padding-inline: var(--s-3);
+}
+
+.categories__grid:has(.cat-card--photo) {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.cat-card--all {
+  justify-content: center;
+  background:
+    radial-gradient(80% 60% at 50% 30%, rgba(242, 201, 163, 0.18), transparent 70%),
+    rgba(248, 237, 219, 0.06);
+  border-color: rgba(242, 201, 163, 0.4);
+}
+
+@media (max-width: 860px) {
+  .categories__grid:has(.cat-card--photo) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
