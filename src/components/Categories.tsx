@@ -24,9 +24,9 @@ const stats = (id: string) => {
 };
 
 export default function Categories() {
-  // With photos, show only the photographed categories plus an "all" tile (6 tiles, 2×3 on phones).
+  // With photos, show only the photographed categories plus an "all" tile.
   const withPhotos = shown.filter((c) => categoryPhotos[c.id]);
-  const photoMode = withPhotos.length >= 4;
+  const photoMode = withPhotos.length >= 3;
   const list = photoMode ? withPhotos : shown;
   const totalCategories = menu.filter((c) => c.id !== "getraenke").length;
 

@@ -30,7 +30,11 @@ export const images = {
  * Category photos generated with Higgsfield (GPT Image) as serving suggestions.
  * A category without an entry falls back to its illustration.
  */
-export const categoryPhotos: Partial<Record<string, SiteImage>> = {};
+export const categoryPhotos: Partial<Record<string, SiteImage>> = {
+  burger: img("kategorie-burger", "Burger im Brioche-Bun mit Cheddar, Salat, Tomate und Gurken", 520, 520),
+  pasta: img("kategorie-pasta", "Spaghetti Bolognese mit Parmesan und Basilikum", 520, 520),
+  schnitzel: img("kategorie-schnitzel", "Paniertes Schnitzel mit Zitrone und Pommes", 520, 520),
+};
 
 export const brand = {
   badge: { src: "/images/brand/rialto-logo-badge.webp", alt: "Rialto Grill Pizzeria Logo", width: 640, height: 640 },
