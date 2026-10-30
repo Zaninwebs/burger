@@ -28,9 +28,12 @@ export const images = {
 
 /**
  * Category photos generated with Higgsfield (GPT Image) as serving suggestions.
+ * Pizza reuses the hero photo from Rialto's printed menu.
  * A category without an entry falls back to its illustration.
  */
 export const categoryPhotos: Partial<Record<string, SiteImage>> = {
+  pizza: images.pizzaHero,
+  doener: img("kategorie-doener", "Döner im Fladenbrot mit Fleisch, Salat, Tomate, Zwiebeln und heller Soße", 520, 520),
   burger: img("kategorie-burger", "Burger im Brioche-Bun mit Cheddar, Salat, Tomate und Gurken", 520, 520),
   pasta: img("kategorie-pasta", "Spaghetti Bolognese mit Parmesan und Basilikum", 520, 520),
   schnitzel: img("kategorie-schnitzel", "Paniertes Schnitzel mit Zitrone und Pommes", 520, 520),

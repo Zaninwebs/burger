@@ -47,7 +47,7 @@ export default function Categories() {
             const s = stats(c.id);
             const photo = categoryPhotos[c.id];
             return (
-              <li key={c.id} data-reveal style={{ "--reveal-delay": (idx % 4) * 80 } as CSSProperties}>
+              <li key={c.id} data-reveal style={{ "--reveal-delay": (idx % (photoMode ? 3 : 4)) * 80 } as CSSProperties}>
                 <a className={`cat-card${photo ? " cat-card--photo" : ""}`} href={`/speisekarte/#kategorie-${c.id}`}>
                   {photo ? (
                     <span className="cat-card__photo">
@@ -71,7 +71,7 @@ export default function Categories() {
             );
           })}
           {photoMode && (
-            <li data-reveal style={{ "--reveal-delay": (list.length % 4) * 80 } as CSSProperties}>
+            <li data-reveal style={{ "--reveal-delay": (list.length % 3) * 80 } as CSSProperties}>
               <a className="cat-card cat-card--all" href="/speisekarte/">
                 <span className="cat-card__icon">
                   <FoodIcon name="oven" />
