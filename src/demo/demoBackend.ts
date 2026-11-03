@@ -9,7 +9,7 @@ import { encrypt, loadSecrets, newId } from './demoSecurity'
 
 const PREFIX = 'aoh-demo:'
 const VERSION_KEY = 'aoh-demo-version'
-const VERSION = '3'
+const VERSION = '4'
 
 const mem = new Map<string, string>()
 const ls = {
@@ -82,7 +82,7 @@ function seed() {
   const samples = [
     { day: 1, time: '10:00', staff: 'simyan', status: 'pending', service: 'Herren-Haarschnitt', name: 'Demo: Max Mustermann', phone: '0171 0000001', message: 'Gern mit Bart.' },
     { day: 1, time: '14:00', staff: 'vanessa', status: 'confirmed', service: 'Farbe, Strähnen oder Balayage', name: 'Demo: Erika Beispiel', phone: '0171 0000002', message: '' },
-    { day: 2, time: null, staff: null, status: 'pending', service: 'Damen-Haarschnitt', name: 'Demo: Anna Probe', phone: '0171 0000003', message: 'Uhrzeit ist mir egal.' },
+    { day: 2, time: '15:00', staff: null, status: 'pending', service: 'Damen-Haarschnitt', name: 'Demo: Anna Probe', phone: '0171 0000003', message: '' },
     { day: 3, time: '11:00', staff: 'graziella', status: 'proposed', service: 'Brautfrisur', name: 'Demo: Lena Test', phone: '0171 0000004', message: 'Probetermin gewünscht.' },
     { day: 4, time: '09:00', staff: 'chiara', status: 'pending', service: 'Föhnen, Styling oder Hochsteckfrisur', name: 'Demo: Sara Muster', phone: '0171 0000005', message: '' },
   ] as const

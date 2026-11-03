@@ -295,6 +295,7 @@ export function createHandler(deps: HandlerDeps) {
     if (!(BOOKABLE_SERVICES as readonly string[]).includes(service)) errors.service = 'Bitte wählen Sie eine Leistung.'
     if (input.consent !== true) errors.consent = 'Bitte bestätigen Sie die Datenschutzhinweise.'
     if (!isIsoDate(date)) errors.date = 'Bitte wählen Sie einen Tag.'
+    if (!time) errors.time = 'Bitte wählen Sie eine Uhrzeit.'
     if (Object.keys(errors).length) return json({ error: 'Bitte prüfen Sie Ihre Angaben.', fields: errors }, 422)
 
     const [settings, dayRequests] = await Promise.all([loadDaySettings(date), loadRequests(date)])

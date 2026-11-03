@@ -141,7 +141,7 @@ export function Booking() {
     go(step + 1)
   }
 
-  const canNext = [!!service, staff !== undefined, !!date && time !== undefined, true, true][step]
+  const canNext = [!!service, staff !== undefined, !!date && !!time, true, true][step]
 
   const submit = async (e: FormEvent) => {
     e.preventDefault()
@@ -200,7 +200,7 @@ export function Booking() {
     { label: 'Leistung', value: service, step: 0 },
     { label: 'Bei', value: staffName(staff), step: 1 },
     { label: 'Tag', value: date ? longDate(date) : '–', step: 2 },
-    { label: 'Uhrzeit', value: time ? `${time} Uhr` : 'Egal – nach Absprache', step: 2 },
+    { label: 'Uhrzeit', value: time ? `${time} Uhr` : '–', step: 2 },
     { label: 'Name', value: name, step: 3 },
     { label: 'Telefon', value: phone, step: 3 },
     ...(email ? [{ label: 'E-Mail', value: email, step: 3 }] : []),
@@ -352,7 +352,7 @@ export function Booking() {
               {step === 2 && (
                 <Step
                   title="Wann passt es Ihnen?"
-                  hint={`Tippen Sie auf einen Tag mit grünem oder gelbem Punkt.${staff ? ` Angezeigt wird, wann ${staffName(staff)} frei ist.` : ''}`}
+                  hint={`Tippen Sie auf einen Tag mit grünem oder gelbem Punkt und wählen Sie dann eine Uhrzeit.${staff ? ` Angezeigt wird, wann ${staffName(staff)} frei ist.` : ''}`}
                   headingRef={heading}
                 >
                   <div className="bk__when">
@@ -384,15 +384,6 @@ export function Booking() {
                           <p className="bk__times-date">{longDate(day.date)}</p>
                           <p className="bk__times-q">Welche Uhrzeit?</p>
                           <div className="bk__slots" role="radiogroup" aria-label="Uhrzeit">
-                            <button
-                              type="button"
-                              role="radio"
-                              aria-checked={time === null}
-                              className={`bk__slot bk__slot--any ${time === null ? 'is-active' : ''}`}
-                              onClick={() => setTime(null)}
-                            >
-                              Uhrzeit egal
-                            </button>
                             {day.slots.map((s) => (
                               <button
                                 key={s.time}
