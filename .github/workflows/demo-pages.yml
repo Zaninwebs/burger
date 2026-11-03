@@ -1,0 +1,38 @@
+# Baut die Demo-Version (ohne Server, mit Demo-Login) und veröffentlicht sie
+# im Unterordner /art-of-hair/ des Branches gh-pages. Andere Demos auf
+# gh-pages (z. B. im Hauptverzeichnis) bleiben unangetastet.
+name: Demo auf GitHub Pages
+
+on:
+  push:
+    branches: [claude/art-of-hair-simyan]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: demo-pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build:preview
+      # Erzwingt einen neuen Commit, damit GitHub Pages die Seite neu baut
+      - run: date -u +%Y-%m-%dT%H:%M:%SZ > dist-preview/build.txt
+      - name: Veröffentlichen
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist-preview
+          publish_branch: gh-pages
+          destination_dir: art-of-hair
+          keep_files: true
