@@ -124,6 +124,28 @@ export function Footer({ home = true }: { home?: boolean }) {
           </span>
         </p>
 
+        <a
+          href={business.instagramUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="footer__insta"
+          aria-label={`Instagram: @${business.instagram}`}
+          data-cursor="Instagram"
+        >
+          <span className="footer__insta-icon" aria-hidden="true">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none">
+              <rect x="2.5" y="2.5" width="19" height="19" rx="5.5" stroke="currentColor" strokeWidth="1.6" />
+              <circle cx="12" cy="12" r="4.3" stroke="currentColor" strokeWidth="1.6" />
+              <circle cx="17.6" cy="6.4" r="1.2" fill="currentColor" />
+            </svg>
+          </span>
+          <span className="footer__insta-text">
+            <small>Folgen Sie uns auf Instagram</small>
+            <strong>@{business.instagram}</strong>
+          </span>
+          <span className="footer__insta-arrow" aria-hidden="true">→</span>
+        </a>
+
         <div className="footer__legal">
           <span>© {year} {business.name}</span>
           <nav aria-label="Rechtliches">

@@ -17,8 +17,8 @@ const Chars = ({ text }: { text: string }) => (
   </span>
 )
 
-// Reihenfolge wie vom Inhaber gewünscht: Föhnen, Porträt, Bart, Logo
-const SLIDES: ImageId[] = ['simyan-foehnen', 'simyan-portrait', 'simyan-bart', 'logo-gold']
+// Reihenfolge wie vom Inhaber gewünscht: Föhnen, Bart, Logo
+const SLIDES: ImageId[] = ['simyan-foehnen', 'simyan-bart', 'logo-gold']
 /** Querformat-Bilder werden vollständig gezeigt statt beschnitten. */
 const CONTAIN: ImageId[] = ['logo-gold']
 
