@@ -224,3 +224,43 @@
     display: none;
   }
 }
+
+/* language menu sits between the reservation button and the menu toggle */
+.brand__name {
+  white-space: nowrap;
+}
+@media (max-width: 1079px) {
+  .header__bar {
+    gap: 14px;
+  }
+  .header__lang .lang__btn {
+    height: 36px;
+    padding: 0 10px;
+    gap: 6px;
+  }
+}
+@media (max-width: 480px) {
+  .brand__sub {
+    display: none;
+  }
+}
+@media (max-width: 380px) {
+  .header__toggle-label {
+    display: none;
+  }
+}
+/* narrow desktops: keep brand, seven links, button and language menu on one line */
+@media (min-width: 1080px) and (max-width: 1320px) {
+  .header__bar {
+    gap: 18px;
+  }
+  .header__nav ul {
+    gap: 16px;
+  }
+  .nav-link {
+    letter-spacing: 0.14em;
+  }
+  .brand__sub {
+    display: none;
+  }
+}

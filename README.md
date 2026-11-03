@@ -113,3 +113,15 @@ server/           API-Handler + Speicher-Adapter
 netlify/functions Netlify-Function-Einstieg
 tests/            API-Integrationstests
 ```
+
+## Sprachen (Deutsch, English, Italiano)
+
+Oben rechts wählen Gäste die Sprache; die Wahl wird im Browser gespeichert. Ein Link mit
+`?lang=en` oder `?lang=it` öffnet die Seite direkt in Englisch bzw. Italienisch.
+
+- Deutsch ist die Ausgangssprache: Texte stehen auf Deutsch im Code und werden mit `t("…")`
+  übersetzt. Die Übersetzungen liegen in `src/i18n/en.ts` und `src/i18n/it.ts`.
+- `npm test` prüft, dass jeder deutsche Text eine englische und italienische Übersetzung hat.
+- Neue Gerichte in `src/data/menu.ts`: Beschreibung (und deutsche Gerichtsnamen) in beiden
+  Dateien ergänzen – italienische Gerichtsnamen bleiben, wie sie sind.
+- Impressum, Datenschutz und der Admin-Bereich bleiben auf Deutsch.

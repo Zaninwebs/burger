@@ -12,9 +12,16 @@ import Menu from "./components/Menu";
 import { CartBar, Pickup } from "./components/Order";
 import Reservation from "./components/Reservation";
 import Story from "./components/Story";
+import { useI18n } from "./i18n";
 import { initSmoothScroll, ScrollTrigger, scrollToHash } from "./lib/motion";
 
 export default function App() {
+  const { t, lang } = useI18n();
+
+  // browser tab title in the chosen language
+  useEffect(() => {
+    document.title = t("Casa Ducale – Italienisches Restaurant & Café in Leverkusen-Wiesdorf");
+  }, [t, lang]);
   useEffect(() => {
     initSmoothScroll();
     // late-loading fonts and images change layout: recalc pinned sections
@@ -26,7 +33,7 @@ export default function App() {
   return (
     <>
       <a href="#main" className="skip-link">
-        Zum Inhalt springen
+        {t("Zum Inhalt springen")}
       </a>
       <Header />
       <main id="main">

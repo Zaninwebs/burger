@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useI18n } from "../i18n";
 import { openStatus, type OpenStatus } from "../lib/hours";
 import "./Icons.css";
 
@@ -13,11 +14,13 @@ export function ScrollMouse({ className = "" }: { className?: string }) {
 
 /** Live "open / closed" pill with a pulsing dot; refreshes every minute. */
 export function OpenBadge({ className = "" }: { className?: string }) {
-  const [status, setStatus] = useState<OpenStatus>(() => openStatus());
+  const { lang } = useI18n();
+  const [now, setNow] = useState(() => new Date());
   useEffect(() => {
-    const t = setInterval(() => setStatus(openStatus()), 60_000);
+    const t = setInterval(() => setNow(new Date()), 60_000);
     return () => clearInterval(t);
   }, []);
+  const status: OpenStatus = openStatus(now, lang);
   return (
     <p className={`open-badge is-${status.state} ${className}`}>
       <span className="open-badge__dot" aria-hidden="true" />

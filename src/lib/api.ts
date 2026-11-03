@@ -94,9 +94,11 @@ export const MONTHS = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Ju
 export const WEEKDAYS_SHORT = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
 const WEEKDAYS_LONG = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"];
 
-export function formatDateLong(iso: string): string {
+/** "Dienstag, 27. Oktober 2026"; pass a locale ("en-GB", "it-IT") for the guest's language. */
+export function formatDateLong(iso: string, locale = "de-DE"): string {
   const d = new Date(`${iso}T12:00:00Z`);
-  return `${WEEKDAYS_LONG[d.getUTCDay()]}, ${d.getUTCDate()}. ${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
+  if (locale === "de-DE") return `${WEEKDAYS_LONG[d.getUTCDay()]}, ${d.getUTCDate()}. ${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
+  return new Intl.DateTimeFormat(locale, { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }).format(d);
 }
 
 export function monthKey(iso: string): string {

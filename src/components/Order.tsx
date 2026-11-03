@@ -4,6 +4,7 @@ import { berlinNow, addDays } from "../../shared/reservations";
 import { business } from "../data/content";
 import { api, ApiError, formatDateLong, IS_DEMO, type OrderConfig, type PublicOrder } from "../lib/api";
 import { cartStore, useCart } from "../lib/cart";
+import { useI18n, type T } from "../i18n";
 import { gsap, prefersReducedMotion, scrollToHash, stopScroll } from "../lib/motion";
 import { site } from "../lib/paths";
 import { ClockIcon, PinIcon } from "./Icons";
@@ -14,13 +15,14 @@ import "./Order.css";
 
 /** "+" next to a dish; turns into a quantity stepper once the dish is in the basket. */
 export function AddToCart({ category, name }: { category: string; name: string }) {
+  const { t } = useI18n();
   const id = dishId(category, name);
   const { cart } = useCart();
   if (!ORDERABLE.has(id)) return null;
   const qty = cart[id] ?? 0;
   if (!qty)
     return (
-      <button type="button" className="add-btn" onClick={() => cartStore.add(id)} aria-label={`${name} zur Abholung hinzufügen`} data-cursor="Add">
+      <button type="button" className="add-btn" onClick={() => cartStore.add(id)} aria-label={t("{name} zur Abholung hinzufügen", { name: t(name) })} data-cursor="Add">
         <svg viewBox="0 0 16 16" aria-hidden="true">
           <path d="M8 2v12M2 8h12" stroke="currentColor" strokeWidth="1.6" fill="none" />
         </svg>
@@ -29,16 +31,18 @@ export function AddToCart({ category, name }: { category: string; name: string }
   return <Stepper id={id} name={name} qty={qty} />;
 }
 
-function Stepper({ id, name, qty }: { id: string; name: string; qty: number }) {
+function Stepper({ id, name: de, qty }: { id: string; name: string; qty: number }) {
+  const { t } = useI18n();
+  const name = t(de);
   return (
-    <span className="stepper" role="group" aria-label={`Menge ${name}`}>
-      <button type="button" onClick={() => cartStore.setQty(id, qty - 1)} aria-label={`${name}: eins weniger`}>
+    <span className="stepper" role="group" aria-label={t("Menge {name}", { name })}>
+      <button type="button" onClick={() => cartStore.setQty(id, qty - 1)} aria-label={t("{name}: eins weniger", { name })}>
         −
       </button>
       <span className="stepper__n" aria-live="polite">
         {qty}
       </span>
-      <button type="button" onClick={() => cartStore.add(id)} aria-label={`${name}: eins mehr`}>
+      <button type="button" onClick={() => cartStore.add(id)} aria-label={t("{name}: eins mehr", { name })}>
         +
       </button>
     </span>
@@ -49,6 +53,7 @@ function Stepper({ id, name, qty }: { id: string; name: string; qty: number }) {
 
 /** "Essen zum Abholen" — explains the service and leads to the menu. */
 export function Pickup() {
+  const { t } = useI18n();
   const root = useRef<HTMLElement>(null);
   const { count } = useCart();
 
@@ -70,10 +75,10 @@ export function Pickup() {
       <div className="container pickup__inner">
         <p className="label eyebrow label--gold">Da Asporto</p>
         <h2 id="pickup-title" className="h2 pickup__title">
-          <Lines lines={["Essen zum", <em key="a">Abholen.</em>]} />
+          <Lines lines={[t("Essen zum"), <em key="a">{t("Abholen.")}</em>]} />
         </h2>
         <p className="pickup__lead">
-          Gerichte online auswählen und zur gewünschten Zeit bei uns am Wiesdorfer Platz abholen — frisch zubereitet, ohne Wartezeit. Wir liefern nicht.
+          {t("Gerichte online auswählen und zur gewünschten Zeit bei uns am Wiesdorfer Platz abholen — frisch zubereitet, ohne Wartezeit. Wir liefern nicht.")}
         </p>
         <ul className="pickup__facts">
           <li className="pickup-fact">
@@ -83,15 +88,15 @@ export function Pickup() {
                 <path d="M9 10V6a3 3 0 0 1 6 0v4" />
               </svg>
             </span>
-            <strong>Gerichte wählen</strong>
-            <span>In der Speisekarte auf + tippen.</span>
+            <strong>{t("Gerichte wählen")}</strong>
+            <span>{t("In der Speisekarte auf + tippen.")}</span>
           </li>
           <li className="pickup-fact">
             <span className="pickup-fact__icon" aria-hidden="true">
               <ClockIcon />
             </span>
-            <strong>Abholzeit festlegen</strong>
-            <span>Heute oder an einem der nächsten Tage.</span>
+            <strong>{t("Abholzeit festlegen")}</strong>
+            <span>{t("Heute oder an einem der nächsten Tage.")}</span>
           </li>
           <li className="pickup-fact">
             <span className="pickup-fact__icon" aria-hidden="true">
@@ -100,27 +105,27 @@ export function Pickup() {
                 <path d="M3 10h18M7 15h3" />
               </svg>
             </span>
-            <strong>Bar oder online zahlen</strong>
-            <span>Bei Abholung an der Theke oder vorab online.</span>
+            <strong>{t("Bar oder online zahlen")}</strong>
+            <span>{t("Bei Abholung an der Theke oder vorab online.")}</span>
           </li>
           <li className="pickup-fact">
             <span className="pickup-fact__icon" aria-hidden="true">
               <PinIcon />
             </span>
-            <strong>Nur Abholung</strong>
+            <strong>{t("Nur Abholung")}</strong>
             <span>
-              {business.street}, {business.city}. Kein Lieferdienst.
+              {business.street}, {business.city}. {t("Kein Lieferdienst.")}
             </span>
           </li>
         </ul>
         <div className="pickup__cta">
           {count > 0 ? (
             <Button variant="gold" onClick={() => cartStore.open()} cursor="Order">
-              Zur Abholung
+              {t("Zur Abholung")}
             </Button>
           ) : (
             <Button href="#speisekarte" variant="gold" cursor="Menu">
-              Zur Speisekarte
+              {t("Zur Speisekarte")}
             </Button>
           )}
         </div>
@@ -133,6 +138,7 @@ export function Pickup() {
 
 /** Floating basket summary; shown as soon as something is in the basket. */
 export function CartBar() {
+  const { t } = useI18n();
   const { count, totalCents } = useCart();
   // back from online payment: ?bestellung=<id> opens the drawer with the result
   const [returning] = useState(() => new URLSearchParams(location.search).get("bestellung"));
@@ -146,10 +152,10 @@ export function CartBar() {
           <span className="cart-bar__count" aria-hidden="true">
             {count}
           </span>
-          <span className="cart-bar__label">Zum Abholen</span>
+          <span className="cart-bar__label">{t("Zum Abholen")}</span>
           <span className="cart-bar__total">{formatEuro(totalCents)}</span>
           <span className="sr-only">
-            , {count} {count === 1 ? "Artikel" : "Artikel"}
+            , {count} {count === 1 ? t("Artikel") : t("Artikel (Mehrzahl)")}
           </span>
         </button>
       </div>
@@ -162,14 +168,20 @@ export function CartBar() {
 
 const EMPTY = { name: "", phone: "", email: "", note: "", slot: "", website: "" };
 
-function dayLabel(date: string): string {
+function dayLabel(date: string, t: T, locale: string): string {
   const today = berlinNow().date;
-  if (date === today) return "Heute";
-  if (date === addDays(today, 1)) return "Morgen";
-  return formatDateLong(date).split(",")[0];
+  if (date === today) return t("Heute");
+  if (date === addDays(today, 1)) return t("Morgen");
+  return formatDateLong(date, locale).split(",")[0];
+}
+
+/** "27. Oktober" / "27 October" / "27 ottobre" */
+function dayMonth(date: string, locale: string): string {
+  return new Intl.DateTimeFormat(locale, { day: "numeric", month: "long", timeZone: "UTC" }).format(new Date(`${date}T12:00:00Z`));
 }
 
 function OrderDrawer({ open, onClose, returningId }: { open: boolean; onClose: () => void; returningId: string | null }) {
+  const { t, locale } = useI18n();
   const panel = useRef<HTMLDivElement>(null);
   const { lines, totalCents, count } = useCart();
   const [cfg, setCfg] = useState<OrderConfig | null>(null);
@@ -322,7 +334,7 @@ function OrderDrawer({ open, onClose, returningId }: { open: boolean; onClose: (
   const err = (k: keyof OrderErrors) =>
     errors[k] ? (
       <p id={`o-${k}-err`} className="field-error" role="alert">
-        {errors[k]}
+        {t(errors[k]!)}
       </p>
     ) : null;
   const aria = (k: keyof OrderErrors) => ({ "aria-invalid": !!errors[k], "aria-describedby": errors[k] ? `o-${k}-err` : undefined });
@@ -333,13 +345,13 @@ function OrderDrawer({ open, onClose, returningId }: { open: boolean; onClose: (
 
   return (
     <div className="drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title">
-      <button type="button" className="drawer__scrim" aria-label="Abholung schließen" tabIndex={-1} onClick={close} />
+      <button type="button" className="drawer__scrim" aria-label={t("Abholung schließen")} tabIndex={-1} onClick={close} />
       <div className="drawer__panel" ref={panel} data-lenis-prevent>
         <header className="drawer__head">
           <p id="drawer-title" className="drawer__title serif">
-            {phase === "done" ? "Ihre Abholung" : <>Zum <em>Abholen</em></>}
+            {phase === "done" ? t("Ihre Abholung") : <>{t("Zum")} <em>{t("Abholen")}</em></>}
           </p>
-          <button type="button" className="drawer__close" onClick={close} aria-label="Schließen">
+          <button type="button" className="drawer__close" onClick={close} aria-label={t("Schließen")}>
             <svg viewBox="0 0 16 16" aria-hidden="true">
               <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" strokeWidth="1.5" />
             </svg>
@@ -351,10 +363,10 @@ function OrderDrawer({ open, onClose, returningId }: { open: boolean; onClose: (
         ) : (
           <form className="drawer__body resv-form" onSubmit={submit} noValidate>
             {/* basket */}
-            <section className="basket" aria-label="Warenkorb">
+            <section className="basket" aria-label={t("Warenkorb")}>
               {lines.length === 0 ? (
                 <div className="basket__empty">
-                  <p>Ihr Warenkorb ist noch leer.</p>
+                  <p>{t("Ihr Warenkorb ist noch leer.")}</p>
                   <Button
                     small
                     variant="ghost"
@@ -364,7 +376,7 @@ function OrderDrawer({ open, onClose, returningId }: { open: boolean; onClose: (
                       setTimeout(() => scrollToHash("#speisekarte"), 50);
                     }}
                   >
-                    Zur Speisekarte
+                    {t("Zur Speisekarte")}
                   </Button>
                 </div>
               ) : (
@@ -372,7 +384,7 @@ function OrderDrawer({ open, onClose, returningId }: { open: boolean; onClose: (
                   {lines.map((l) => (
                     <li key={l.id} className="basket__line">
                       <div>
-                        <p className="basket__name">{l.name}</p>
+                        <p className="basket__name">{t(l.name)}</p>
                         <p className="basket__unit muted">{formatEuro(l.cents)}</p>
                       </div>
                       <Stepper id={l.id} name={l.name} qty={l.qty} />
@@ -384,71 +396,71 @@ function OrderDrawer({ open, onClose, returningId }: { open: boolean; onClose: (
               {err("items")}
               {lines.length > 0 && (
                 <p className="basket__total">
-                  <span>Summe</span>
+                  <span>{t("Summe")}</span>
                   <strong>{formatEuro(totalCents)}</strong>
                 </p>
               )}
             </section>
 
-            {cfgError && <p className="form-error">{cfgError}</p>}
+            {cfgError && <p className="form-error">{t(cfgError)}</p>}
             {paused && (
               <p className="form-error">
-                Online-Abholung ist gerade pausiert. Rufen Sie uns gerne an: <strong>{business.phoneDisplay}</strong>
+                {t("Online-Abholung ist gerade pausiert. Rufen Sie uns gerne an:")} <strong>{business.phoneDisplay}</strong>
               </p>
             )}
             {noSlots && (
               <p className="form-error">
-                Für heute und die nächsten Tage sind keine Abholzeiten mehr frei. Bitte rufen Sie uns an: {business.phoneDisplay}
+                {t("Für heute und die nächsten Tage sind keine Abholzeiten mehr frei. Bitte rufen Sie uns an:")} {business.phoneDisplay}
               </p>
             )}
 
             {lines.length > 0 && cfg?.enabled && !noSlots && (
               <>
                 <div className={`field ${errors.time ? "has-error" : ""}`}>
-                  <label htmlFor="o-slot">Abholzeit</label>
+                  <label htmlFor="o-slot">{t("Abholzeit")}</label>
                   <select id="o-slot" name="slot" value={f.slot} onChange={change("slot")} {...aria("time")}>
-                    <option value="">Uhrzeit wählen</option>
+                    <option value="">{t("Uhrzeit wählen")}</option>
                     {cfg.slots.map((d) => (
-                      <optgroup key={d.date} label={`${dayLabel(d.date)} · ${formatDateLong(d.date).split(", ")[1]}`}>
-                        {d.times.map((t) => (
-                          <option key={t} value={`${d.date} ${t}`}>
-                            {dayLabel(d.date)}, {t} Uhr
+                      <optgroup key={d.date} label={`${dayLabel(d.date, t, locale)} · ${dayMonth(d.date, locale)}`}>
+                        {d.times.map((tm) => (
+                          <option key={tm} value={`${d.date} ${tm}`}>
+                            {dayLabel(d.date, t, locale)}, {t("{time} Uhr", { time: tm })}
                           </option>
                         ))}
                       </optgroup>
                     ))}
                   </select>
-                  <p className="field-hint">Zubereitung ca. {cfg.leadMinutes} Minuten · Abholung im Restaurant</p>
+                  <p className="field-hint">{t("Zubereitung ca. {min} Minuten · Abholung im Restaurant", { min: cfg.leadMinutes })}</p>
                   {err("time")}
                 </div>
 
                 <div className={`field ${errors.name ? "has-error" : ""}`}>
-                  <label htmlFor="o-name">Name</label>
-                  <input id="o-name" name="name" autoComplete="name" placeholder="Für die Abholung" value={f.name} onChange={change("name")} maxLength={80} {...aria("name")} />
+                  <label htmlFor="o-name">{t("Name")}</label>
+                  <input id="o-name" name="name" autoComplete="name" placeholder={t("Für die Abholung")} value={f.name} onChange={change("name")} maxLength={80} {...aria("name")} />
                   {err("name")}
                 </div>
                 <div className={`field ${errors.phone ? "has-error" : ""}`}>
-                  <label htmlFor="o-phone">Telefon</label>
-                  <input id="o-phone" name="phone" type="tel" inputMode="tel" autoComplete="tel" placeholder="Für Rückfragen" value={f.phone} onChange={change("phone")} maxLength={24} {...aria("phone")} />
+                  <label htmlFor="o-phone">{t("Telefon")}</label>
+                  <input id="o-phone" name="phone" type="tel" inputMode="tel" autoComplete="tel" placeholder={t("Für Rückfragen")} value={f.phone} onChange={change("phone")} maxLength={24} {...aria("phone")} />
                   {err("phone")}
                 </div>
                 <div className={`field ${errors.email ? "has-error" : ""}`}>
-                  <label htmlFor="o-email">E-Mail {payment === "cash" && <span className="field-opt">(optional)</span>}</label>
-                  <input id="o-email" name="email" type="email" inputMode="email" autoComplete="email" placeholder="Für die Bestätigung" value={f.email} onChange={change("email")} maxLength={120} {...aria("email")} />
+                  <label htmlFor="o-email">{t("E-Mail")} {payment === "cash" && <span className="field-opt">({t("optional")})</span>}</label>
+                  <input id="o-email" name="email" type="email" inputMode="email" autoComplete="email" placeholder={t("Für die Bestätigung")} value={f.email} onChange={change("email")} maxLength={120} {...aria("email")} />
                   {err("email")}
                 </div>
                 <div className={`field ${errors.note ? "has-error" : ""}`}>
-                  <label htmlFor="o-note">Hinweis</label>
-                  <textarea id="o-note" name="note" rows={2} placeholder="Allergien, Wünsche …" value={f.note} onChange={change("note")} maxLength={400} {...aria("note")} />
+                  <label htmlFor="o-note">{t("Hinweis")}</label>
+                  <textarea id="o-note" name="note" rows={2} placeholder={t("Allergien, Wünsche …")} value={f.note} onChange={change("note")} maxLength={400} {...aria("note")} />
                   {err("note")}
                 </div>
 
                 <fieldset className="pay">
-                  <legend>Bezahlung</legend>
+                  <legend>{t("Bezahlung")}</legend>
                   <label className={`pay__opt ${payment === "cash" ? "is-active" : ""}`}>
                     <input type="radio" name="payment" value="cash" checked={payment === "cash"} onChange={() => setPayment("cash")} />
-                    <span className="pay__title">Bar bei Abholung</span>
-                    <span className="pay__desc">Sie bezahlen an der Theke.</span>
+                    <span className="pay__title">{t("Bar bei Abholung")}</span>
+                    <span className="pay__desc">{t("Sie bezahlen an der Theke.")}</span>
                   </label>
                   <label className={`pay__opt ${payment === "online" ? "is-active" : ""} ${cfg.onlinePayment ? "" : "is-disabled"}`}>
                     <input
@@ -459,9 +471,9 @@ function OrderDrawer({ open, onClose, returningId }: { open: boolean; onClose: (
                       disabled={!cfg.onlinePayment}
                       onChange={() => setPayment("online")}
                     />
-                    <span className="pay__title">Online bezahlen</span>
+                    <span className="pay__title">{t("Online bezahlen")}</span>
                     <span className="pay__desc">
-                      {cfg.onlinePayment ? "Karte, PayPal, Apple Pay oder Google Pay — sicher vorab." : "Derzeit nicht verfügbar."}
+                      {cfg.onlinePayment ? t("Karte, PayPal, Apple Pay oder Google Pay — sicher vorab.") : t("Derzeit nicht verfügbar.")}
                     </span>
                   </label>
                   {err("payment")}
@@ -484,9 +496,9 @@ function OrderDrawer({ open, onClose, returningId }: { open: boolean; onClose: (
                   />
                   <span className="consent__box" aria-hidden="true" />
                   <span>
-                    Ich bin einverstanden, dass meine Angaben zur Abwicklung der Abholung gespeichert werden (
+                    {t("Ich bin einverstanden, dass meine Angaben zur Abwicklung der Abholung gespeichert werden")} (
                     <a className="link link--static" href={site("datenschutz/index.html")} target="_blank" rel="noopener">
-                      Datenschutz
+                      {t("Datenschutz")}
                     </a>
                     ).
                   </span>
@@ -497,7 +509,7 @@ function OrderDrawer({ open, onClose, returningId }: { open: boolean; onClose: (
 
             {formError && (
               <p className="form-error" role="alert">
-                {formError}
+                {t(formError)}
               </p>
             )}
             {lines.length > 0 && cfg?.enabled && !noSlots && (
@@ -505,14 +517,14 @@ function OrderDrawer({ open, onClose, returningId }: { open: boolean; onClose: (
                 <Button type="submit" variant="gold" disabled={phase === "sending"} className="resv-form__submit" cursor="Order">
                   {phase === "sending"
                     ? payment === "online"
-                      ? "Weiter zur Zahlung …"
-                      : "Wird gesendet …"
+                      ? t("Weiter zur Zahlung …")
+                      : t("Wird gesendet …")
                     : payment === "online"
-                      ? `Online bezahlen · ${formatEuro(totalCents)}`
-                      : `Abholung abschicken · ${formatEuro(totalCents)}`}
+                      ? `${t("Online bezahlen")} · ${formatEuro(totalCents)}`
+                      : `${t("Abholung abschicken")} · ${formatEuro(totalCents)}`}
                 </Button>
                 <p className="drawer__fine muted">
-                  {count} {count === 1 ? "Artikel" : "Artikel"} · Nur Abholung, keine Lieferung · Preise inkl. MwSt.
+                  {count} {count === 1 ? t("Artikel") : t("Artikel (Mehrzahl)")} · {t("Nur Abholung, keine Lieferung · Preise inkl. MwSt.")}
                 </p>
               </div>
             )}
@@ -536,6 +548,7 @@ function OrderDone({
   error: string;
   onClose: () => void;
 }) {
+  const { t, locale } = useI18n();
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!ref.current || prefersReducedMotion()) return;
@@ -545,47 +558,47 @@ function OrderDone({
   if (order.paymentStatus === "open")
     return (
       <div className="drawer__body order-done" ref={ref}>
-        <p className="label label--gold">{cancelled ? "Zahlung abgebrochen" : "Zahlung ausstehend"}</p>
-        <p className="h3">Ihre Abholung ist noch nicht bezahlt.</p>
-        <p className="muted">Möchten Sie stattdessen bar bei Abholung bezahlen? Dann geben wir sie jetzt an die Küche weiter.</p>
-        {error && <p className="form-error">{error}</p>}
+        <p className="label label--gold">{cancelled ? t("Zahlung abgebrochen") : t("Zahlung ausstehend")}</p>
+        <p className="h3">{t("Ihre Abholung ist noch nicht bezahlt.")}</p>
+        <p className="muted">{t("Möchten Sie stattdessen bar bei Abholung bezahlen? Dann geben wir sie jetzt an die Küche weiter.")}</p>
+        {error && <p className="form-error">{t(error)}</p>}
         <Button variant="gold" onClick={onCash}>
-          Bar bei Abholung bezahlen
+          {t("Bar bei Abholung bezahlen")}
         </Button>
       </div>
     );
 
   return (
     <div className="drawer__body order-done" ref={ref}>
-      <p className="label label--gold">Abholung eingegangen</p>
+      <p className="label label--gold">{t("Abholung eingegangen")}</p>
       <p className="order-done__title h2">
         <em>Grazie</em>, {order.name.split(" ")[0]}.
       </p>
       <div className="order-done__code">
-        <span className="label">Ihre Abholnummer</span>
+        <span className="label">{t("Ihre Abholnummer")}</span>
         <strong>{order.code}</strong>
       </div>
       <p className="order-done__when">
-        {dayLabel(order.date)}, {order.time} Uhr · {business.street}
+        {dayLabel(order.date, t, locale)}, {t("{time} Uhr", { time: order.time })} · {business.street}
       </p>
       <ul className="order-done__lines">
         {order.lines.map((l) => (
           <li key={l.id}>
             <span>
-              {l.qty} × {l.name}
+              {l.qty} × {t(l.name)}
             </span>
             <span>{formatEuro(l.qty * l.cents)}</span>
           </li>
         ))}
         <li className="order-done__sum">
-          <span>{order.paymentStatus === "paid" ? "Bezahlt" : "Bar bei Abholung"}</span>
+          <span>{order.paymentStatus === "paid" ? t("Bezahlt") : t("Bar bei Abholung")}</span>
           <strong>{formatEuro(order.totalCents)}</strong>
         </li>
       </ul>
-      <p className="muted">Nennen Sie an der Theke einfach Ihre Abholnummer. Bei Fragen erreichen Sie uns unter {business.phoneDisplay}.</p>
-      {IS_DEMO && <p className="resv-demo">Demo-Version: Diese Abholung wurde nicht wirklich gesendet{order.payment === "online" ? ", die Zahlung ist simuliert" : ""}.</p>}
+      <p className="muted">{t("Nennen Sie an der Theke einfach Ihre Abholnummer. Bei Fragen erreichen Sie uns unter {phone}.", { phone: business.phoneDisplay })}</p>
+      {IS_DEMO && <p className="resv-demo">{order.payment === "online" ? t("Demo-Version: Diese Abholung wurde nicht wirklich gesendet, die Zahlung ist simuliert.") : t("Demo-Version: Diese Abholung wurde nicht wirklich gesendet.")}</p>}
       <Button variant="ghost" className="on-dark" small onClick={onClose}>
-        Schließen
+        {t("Schließen")}
       </Button>
     </div>
   );

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { gsap, isFinePointer, prefersReducedMotion } from "../lib/motion";
+import { useI18n } from "../i18n";
 import { useCart } from "../lib/cart";
 import { Button } from "./ui";
 import "./Chrome.css";
@@ -52,6 +53,7 @@ export function Cursor() {
 
 /** Mobile bottom CTA — appears after the hero, hides near the form and footer. */
 export function StickyCta() {
+  const { t } = useI18n();
   const [visible, setShow] = useState(false);
   // the basket bar takes this spot once something is in the basket
   const { count } = useCart();
@@ -87,7 +89,7 @@ export function StickyCta() {
   return (
     <div className={`sticky-cta ${show ? "is-visible" : ""}`} aria-hidden={!show} inert={!show}>
       <Button href="#reservieren" variant="gold">
-        Tisch reservieren
+        {t("Tisch reservieren")}
       </Button>
     </div>
   );

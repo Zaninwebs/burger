@@ -1,10 +1,12 @@
 import { useRef } from "react";
 import { story } from "../data/content";
+import { useI18n } from "../i18n";
 import { gsap } from "../lib/motion";
 import { Lines, Picture, revealOnScroll, useGsap, Words } from "./ui";
 import "./Story.css";
 
 export default function Story() {
+  const { t, lang } = useI18n();
   const root = useRef<HTMLElement>(null);
 
   useGsap(root, ({ reduced, q }) => {
@@ -83,30 +85,31 @@ export default function Story() {
       ease: "expo.inOut",
       scrollTrigger: { trigger: q(".story__facts")[0], start: "top 85%", once: true },
     });
-  });
+    // the manifesto is split into words: rebuild the animation for each language
+  }, [lang]);
 
   return (
     <section id="restaurant" ref={root} className="story" aria-labelledby="story-title">
       <div className="container">
         <p className="label eyebrow story__eyebrow">Il Ristorante</p>
         <p className="story__manifesto display">
-          <Words text="Ein Ort für gutes Essen." />
+          <Words text={t("Ein Ort für gutes Essen.")} />
           <br />
           <em>
-            <Words text="Für gute Momente." />
+            <Words text={t("Für gute Momente.")} />
           </em>
         </p>
 
         <div className="story__grid">
           <div className="story__text">
             <h2 id="story-title" className="story__head h2">
-              <Lines lines={["Willkommen", <em key="c">in der Casa.</em>]} />
+              <Lines lines={[t("Willkommen"), <em key="c">{t("in der Casa.")}</em>]} />
             </h2>
             <div className="story__copy">
-              <p className="lead">{story.lead}</p>
+              <p className="lead">{t(story.lead)}</p>
               {story.body.map((p) => (
                 <p key={p} className="muted">
-                  {p}
+                  {t(p)}
                 </p>
               ))}
             </div>
@@ -116,13 +119,13 @@ export default function Story() {
             <Picture
               name="fondo"
               className="story__img story__img--a"
-              alt="Brühe mit frischen Kräutern und Lorbeer in einem Topf in der Küche"
+              alt={t("Brühe mit frischen Kräutern und Lorbeer in einem Topf in der Küche")}
               sizes="(min-width: 900px) 34vw, 78vw"
             />
             <Picture
               name="salmone-risotto"
               className="story__img story__img--b"
-              alt="Lachs auf Brot mit Avocado und Salat, dahinter Risotto"
+              alt={t("Lachs auf Brot mit Avocado und Salat, dahinter Risotto")}
               sizes="(min-width: 900px) 20vw, 46vw"
             />
           </div>
@@ -135,10 +138,10 @@ export default function Story() {
               <li key={f.label} className="fact">
                 <span className="fact__rule" aria-hidden="true" />
                 <span className="fact__value display" data-count={numeric ? f.value : undefined}>
-                  {f.value}
+                  {numeric ? f.value : t(f.value)}
                 </span>
-                <span className="fact__label label">{f.label}</span>
-                <span className="fact__sub muted">{f.sub}</span>
+                <span className="fact__label label">{t(f.label)}</span>
+                <span className="fact__sub muted">{t(f.sub)}</span>
               </li>
             );
           })}

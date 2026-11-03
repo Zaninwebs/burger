@@ -1,10 +1,12 @@
 import { useRef } from "react";
+import { useI18n } from "../i18n";
 import { gsap } from "../lib/motion";
 import { Lines, Picture, useGsap } from "./ui";
 import "./Atmosphere.css";
 
 /** Pinned image that grows from a small window to the full viewport. */
 export default function Atmosphere() {
+  const { t } = useI18n();
   const root = useRef<HTMLElement>(null);
 
   useGsap(root, ({ reduced, q }) => {
@@ -45,7 +47,7 @@ export default function Atmosphere() {
         <div className="atmo__frame">
           <Picture
             name="cheesecake-piazza"
-            alt="Käsekuchen auf einer Etagere, im Hintergrund das Bild einer italienischen Piazza"
+            alt={t("Käsekuchen auf einer Etagere, im Hintergrund das Bild einer italienischen Piazza")}
             sizes="100vw"
             focus="50% 40%"
           />
@@ -54,11 +56,10 @@ export default function Atmosphere() {
         <div className="atmo__copy container">
           <p className="label label--gold atmo__reveal">L’Atmosfera</p>
           <h2 id="atmo-title" className="h2">
-            <Lines lines={["Ein Stück Piazza,", <em key="m">mitten in Leverkusen.</em>]} />
+            <Lines lines={[t("Ein Stück Piazza,"), <em key="m">{t("mitten in Leverkusen.")}</em>]} />
           </h2>
           <p className="atmo__text atmo__reveal">
-            Ein Espresso am Morgen, ein langer Abend mit Freunden — Casa Ducale in den Luminaden am Wiesdorfer Platz ist
-            ein Ort zum Ankommen.
+            {t("Ein Espresso am Morgen, ein langer Abend mit Freunden — Casa Ducale in den Luminaden am Wiesdorfer Platz ist ein Ort zum Ankommen.")}
           </p>
         </div>
       </div>

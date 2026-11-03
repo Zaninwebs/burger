@@ -1,11 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { business, fullAddress, hours, nav } from "../data/content";
 import { gsap, prefersReducedMotion, scrollToHash, stopScroll } from "../lib/motion";
+import { useI18n } from "../i18n";
 import Emblem from "./Emblem";
+import LangSwitch from "./LangSwitch";
 import { Button } from "./ui";
 import "./Header.css";
 
 export default function Header() {
+  const { t } = useI18n();
   const [scrolled, setScrolled] = useState(false);
   const [hidden, setHidden] = useState(false);
   const [open, setOpen] = useState(false);
@@ -111,7 +114,7 @@ export default function Header() {
   return (
     <header className={cls}>
       <div className="header__bar">
-        <a className="brand" href="#top" onClick={go("#top")} aria-label="Casa Ducale — zum Seitenanfang">
+        <a className="brand" href="#top" onClick={go("#top")} aria-label={t("Casa Ducale — zum Seitenanfang")}>
           <Emblem className="brand__lily" title="" sizes="30px" priority />
           <span className="brand__text">
             <span className="brand__name">Casa Ducale</span>
@@ -119,7 +122,7 @@ export default function Header() {
           </span>
         </a>
 
-        <nav className="header__nav" aria-label="Hauptnavigation">
+        <nav className="header__nav" aria-label={t("Hauptnavigation")}>
           <ul>
             {nav.map((n) => (
               <li key={n.href}>
@@ -129,7 +132,7 @@ export default function Header() {
                   className={`nav-link ${active === n.href ? "is-active" : ""}`}
                   aria-current={active === n.href ? "true" : undefined}
                 >
-                  {n.label}
+                  {t(n.label)}
                 </a>
               </li>
             ))}
@@ -138,9 +141,11 @@ export default function Header() {
 
         <div className="header__cta">
           <Button href="#reservieren" small variant="gold" cursor="Reserve">
-            Tisch reservieren
+            {t("Tisch reservieren")}
           </Button>
         </div>
+
+        <LangSwitch className="header__lang" />
 
         <button
           ref={toggleRef}
@@ -150,9 +155,9 @@ export default function Header() {
           aria-controls="mobile-menu"
           onClick={() => setOpen((o) => !o)}
         >
-          <span className="sr-only">{open ? "Menü schließen" : "Menü öffnen"}</span>
+          <span className="sr-only">{open ? t("Menü schließen") : t("Menü öffnen")}</span>
           <span className="header__toggle-label" aria-hidden="true">
-            {open ? "Schließen" : "Menü"}
+            {open ? t("Schließen") : t("Menü")}
           </span>
           <span className="header__toggle-icon" aria-hidden="true">
             <span />
@@ -162,14 +167,12 @@ export default function Header() {
       </div>
 
       <div id="mobile-menu" ref={menuRef} className="menu theme-dark" aria-hidden={!open} inert={!open}>
-        <nav aria-label="Mobile Navigation">
+        <nav aria-label={t("Mobile Navigation")}>
           <ul className="menu__list">
             {nav.concat({ href: "#reservieren", label: "Reservieren" }).map((n) => (
               <li key={n.href}>
                 <a className="menu__link" href={n.href} onClick={go(n.href)}>
-                  <span>
-                    {n.label}
-                  </span>
+                  <span>{t(n.label)}</span>
                 </a>
               </li>
             ))}
@@ -183,11 +186,11 @@ export default function Header() {
           <p>
             {hours
               .filter((h) => h.time)
-              .map((h) => `${h.short} ${h.time}`)
+              .map((h) => `${t(h.short)} ${h.time}`)
               .join(" · ")}
           </p>
           <Button href="#reservieren" variant="gold" onClick={() => setOpen(false)}>
-            Tisch reservieren
+            {t("Tisch reservieren")}
           </Button>
         </div>
         <Emblem className="menu__lily" title="" sizes="60vw" />

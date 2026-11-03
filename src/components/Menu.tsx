@@ -1,5 +1,6 @@
 import { useLayoutEffect, useRef, useState } from "react";
 import { menu, MENU_NOTE } from "../data/menu";
+import { useI18n } from "../i18n";
 import { gsap, prefersReducedMotion } from "../lib/motion";
 import Emblem from "./Emblem";
 import { AddToCart } from "./Order";
@@ -7,6 +8,7 @@ import { Button, Lines, revealOnScroll, useGsap } from "./ui";
 import "./Menu.css";
 
 export default function Menu() {
+  const { t } = useI18n();
   const root = useRef<HTMLElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const tabsRef = useRef<HTMLDivElement>(null);
@@ -80,7 +82,7 @@ export default function Menu() {
               <Lines lines={["Die", <em key="s">Speisekarte.</em>]} />
             </h2>
           </header>
-          <div className="menu-sec__tabs" role="tablist" aria-label="Kategorien" ref={tabsRef} onKeyDown={onKey}>
+          <div className="menu-sec__tabs" role="tablist" aria-label={t("Kategorien")} ref={tabsRef} onKeyDown={onKey}>
             {menu.map((c) => (
               <button
                 key={c.id}
@@ -93,7 +95,7 @@ export default function Menu() {
                 className={`menu-tab ${c.id === active ? "is-active" : ""}`}
                 onClick={() => select(c.id)}
               >
-                <span className="menu-tab__label">{c.label}</span>
+                <span className="menu-tab__label">{t(c.label)}</span>
                 <span className="menu-tab__it serif">{c.italian}</span>
               </button>
             ))}
@@ -113,14 +115,14 @@ export default function Menu() {
             <h3 className="menu-cat__title">
               <Lines lines={[<em key="i">{category.italian}</em>]} />
             </h3>
-            {category.intro && <p className="muted">{category.intro}</p>}
+            {category.intro && <p className="muted">{t(category.intro)}</p>}
           </div>
           <ul className="menu-cat__list">
             {category.dishes.map((d) => (
               <li key={d.name} className={`dish ${d.house ? "dish--house" : ""}`}>
                 <div className="dish__row">
                   <span className="dish__name">
-                    {d.name}
+                    {t(d.name)}
                     {d.house && (
                       <span className="dish__badge label">
                         <Emblem className="dish__lily" title="" sizes="12px" />
@@ -132,26 +134,26 @@ export default function Menu() {
                   <span className="dish__price">
                     {d.price ? (
                       <>
-                        {d.price}
+                        {d.price.replace(/^ab /, `${t("ab")} `)}
                         <span className="dish__eur"> €</span>
                       </>
                     ) : (
-                      <span className="dish__na" title="Preis auf Anfrage">
-                        —<span className="sr-only">Preis im Restaurant erfragen</span>
+                      <span className="dish__na" title={t("Preis auf Anfrage")}>
+                        —<span className="sr-only">{t("Preis im Restaurant erfragen")}</span>
                       </span>
                     )}
                   </span>
                   <AddToCart category={category.id} name={d.name} />
                 </div>
-                {d.description && <p className="dish__desc muted">{d.description}</p>}
+                {d.description && <p className="dish__desc muted">{t(d.description)}</p>}
               </li>
             ))}
           </ul>
           <p className="menu-cat__note">
-            Mit <span className="menu-cat__plus" aria-hidden="true">+</span> wählen Sie Gerichte zum Abholen aus. {MENU_NOTE}
+            {t("Mit")} <span className="menu-cat__plus" aria-hidden="true">+</span> {t("wählen Sie Gerichte zum Abholen aus.")} {t(MENU_NOTE)}
           </p>
           <Button href="#reservieren" cursor="Reserve">
-            Tisch reservieren
+            {t("Tisch reservieren")}
           </Button>
         </div>
       </div>

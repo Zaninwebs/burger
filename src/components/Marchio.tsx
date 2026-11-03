@@ -1,4 +1,5 @@
 import { useRef } from "react";
+import { useI18n } from "../i18n";
 import { gsap } from "../lib/motion";
 import Emblem from "./Emblem";
 import { Lines, Picture, useGsap } from "./ui";
@@ -6,6 +7,7 @@ import "./Marchio.css";
 
 /** Brand stage: the fleur-de-lis drawn in gold, next to the real house sign. */
 export default function Marchio() {
+  const { t } = useI18n();
   const root = useRef<HTMLElement>(null);
 
   useGsap(root, ({ reduced, q }) => {
@@ -72,7 +74,7 @@ export default function Marchio() {
         <div className="marchio__stage">
           <div className="marchio__lily-wrap">
             <div className="marchio__halo" aria-hidden="true" />
-            <Emblem className="marchio__lily" title="Die goldene Lilie von Casa Ducale" sizes="(min-width: 900px) 260px, 150px" />
+            <Emblem className="marchio__lily" title={t("Die goldene Lilie von Casa Ducale")} sizes="(min-width: 900px) 260px, 150px" />
             <span className="marchio__shine" aria-hidden="true" />
           </div>
           <h2 id="marchio-title" className="marchio__name">
@@ -81,7 +83,7 @@ export default function Marchio() {
           <span className="marchio__rule" aria-hidden="true" />
           <div className="marchio__meta">
             <p className="label">Cucina Italiana</p>
-            <p className="muted">Die goldene Lilie — das Zeichen unseres Hauses.</p>
+            <p className="muted">{t("Die goldene Lilie — das Zeichen unseres Hauses.")}</p>
           </div>
         </div>
 
@@ -89,7 +91,7 @@ export default function Marchio() {
           <Picture
             name="fragole-insegna"
             className="marchio__photo"
-            alt="Dessert mit frischen Erdbeeren vor dem schwarz-goldenen Schild „Casa Ducale – Cucina Italiana“"
+            alt={t("Dessert mit frischen Erdbeeren vor dem schwarz-goldenen Schild „Casa Ducale – Cucina Italiana“")}
             sizes="(min-width: 900px) 34vw, 86vw"
           />
           <figcaption className="label marchio__caption">Dolce della casa</figcaption>

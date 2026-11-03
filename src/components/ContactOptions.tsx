@@ -1,7 +1,7 @@
 import { business } from "../data/content";
+import { useI18n } from "../i18n";
 import "./ContactOptions.css";
 
-const GREETING = "Hallo Casa Ducale, ich möchte gerne einen Tisch reservieren: ";
 
 function WhatsAppIcon() {
   return (
@@ -38,26 +38,28 @@ function CallIcon() {
 type Option = { key: string; label: string; detail: string; href: string | null; icon: React.ReactNode; external?: boolean };
 
 /** Three direct ways to reach the restaurant: WhatsApp, e-mail, phone. */
-export default function ContactOptions({ title = "Oder direkt Kontakt aufnehmen" }: { title?: string }) {
+export default function ContactOptions({ title }: { title?: string }) {
+  const { t } = useI18n();
+  const greeting = t("Hallo Casa Ducale, ich möchte gerne einen Tisch reservieren: ");
   const options: Option[] = [
     {
       key: "whatsapp",
       label: "WhatsApp",
-      detail: business.whatsapp ? "Nachricht schreiben" : "Nummer folgt",
-      href: business.whatsapp ? `https://wa.me/${business.whatsapp}?text=${encodeURIComponent(GREETING)}` : null,
+      detail: business.whatsapp ? t("Nachricht schreiben") : t("Nummer folgt"),
+      href: business.whatsapp ? `https://wa.me/${business.whatsapp}?text=${encodeURIComponent(greeting)}` : null,
       icon: <WhatsAppIcon />,
       external: true,
     },
     {
       key: "mail",
-      label: "E-Mail",
-      detail: business.email ?? "Adresse folgt",
-      href: business.email ? `mailto:${business.email}?subject=${encodeURIComponent("Tischreservierung")}` : null,
+      label: t("E-Mail"),
+      detail: business.email ?? t("Adresse folgt"),
+      href: business.email ? `mailto:${business.email}?subject=${encodeURIComponent(t("Tischreservierung"))}` : null,
       icon: <MailIcon />,
     },
     {
       key: "call",
-      label: "Anrufen",
+      label: t("Anrufen"),
       detail: business.phoneDisplay,
       href: business.phoneHref,
       icon: <CallIcon />,
@@ -66,7 +68,7 @@ export default function ContactOptions({ title = "Oder direkt Kontakt aufnehmen"
 
   return (
     <div className="contact-options">
-      <p className="contact-options__title">{title}</p>
+      <p className="contact-options__title">{title ?? t("Oder direkt Kontakt aufnehmen")}</p>
       <ul className="contact-options__list">
         {options.map((o) => {
           const inner = (

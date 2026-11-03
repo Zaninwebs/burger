@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { ImageName } from "../data/images.gen";
+import { useI18n } from "../i18n";
 import { gsap, prefersReducedMotion, stopScroll } from "../lib/motion";
 import { Lines, Picture, revealOnScroll, useGsap } from "./ui";
 import "./Gallery.css";
@@ -25,6 +26,7 @@ const SHOTS: Shot[] = [
 const COLUMNS = [SHOTS.filter((_, i) => i % 3 === 0), SHOTS.filter((_, i) => i % 3 === 1), SHOTS.filter((_, i) => i % 3 === 2)];
 
 export default function Gallery() {
+  const { t } = useI18n();
   const root = useRef<HTMLElement>(null);
   const [index, setIndex] = useState<number | null>(null);
   const opener = useRef<HTMLElement | null>(null);
@@ -77,7 +79,7 @@ export default function Gallery() {
         <header className="gallery__head">
           <p className="label eyebrow label--gold">Momenti</p>
           <h2 id="gallery-title" className="h2 gallery__title">
-            <Lines lines={["Momente", <em key="c">aus der Casa.</em>]} />
+            <Lines lines={[t("Momente"), <em key="c">{t("aus der Casa.")}</em>]} />
           </h2>
         </header>
 
@@ -93,11 +95,11 @@ export default function Gallery() {
                       className="shot__btn"
                       data-cursor="View"
                       onClick={(e) => open(i, e.currentTarget)}
-                      aria-label={`${s.caption} vergrößern`}
+                      aria-label={t("{caption} vergrößern", { caption: s.caption })}
                     >
                       <Picture
                         name={s.name}
-                        alt={s.alt}
+                        alt={t(s.alt)}
                         sizes="(min-width: 900px) 30vw, 46vw"
                         className="shot__pic"
                       />
@@ -137,6 +139,7 @@ function Lightbox({
   const ref = useRef<HTMLDivElement>(null);
   const closeBtn = useRef<HTMLButtonElement>(null);
   const touch = useRef<{ x: number; y: number } | null>(null);
+  const { t } = useI18n();
   const shot = shots[index];
   const go = useCallback((d: number) => onIndex((index + d + shots.length) % shots.length), [index, onIndex, shots.length]);
 
@@ -190,7 +193,7 @@ function Lightbox({
       className="lightbox"
       role="dialog"
       aria-modal="true"
-      aria-label={`Bild ${index + 1} von ${shots.length}: ${shot.caption}`}
+      aria-label={t("Bild {n} von {total}: {caption}", { n: index + 1, total: shots.length, caption: shot.caption })}
       onTouchStart={(e) => (touch.current = { x: e.touches[0].clientX, y: e.touches[0].clientY })}
       onTouchEnd={(e) => {
         if (!touch.current) return;
@@ -206,14 +209,14 @@ function Lightbox({
           {String(index + 1).padStart(2, "0")} / {String(shots.length).padStart(2, "0")}
         </span>
         <button ref={closeBtn} type="button" className="lightbox__close label" onClick={animatedClose}>
-          Schließen <span aria-hidden="true">✕</span>
+          {t("Schließen")} <span aria-hidden="true">✕</span>
         </button>
       </div>
       <div className="lightbox__stage" onClick={(e) => e.target === e.currentTarget && animatedClose()}>
-        <Picture key={shot.name} name={shot.name} alt={shot.alt} sizes="92vw" className="lightbox__pic" priority />
+        <Picture key={shot.name} name={shot.name} alt={t(shot.alt)} sizes="92vw" className="lightbox__pic" priority />
       </div>
       <div className="lightbox__bottom">
-        <button type="button" className="lightbox__nav" onClick={() => go(-1)} aria-label="Vorheriges Bild">
+        <button type="button" className="lightbox__nav" onClick={() => go(-1)} aria-label={t("Vorheriges Bild")}>
           <svg viewBox="0 0 24 24" width="22">
             <path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" strokeWidth="1.4" />
           </svg>
@@ -221,7 +224,7 @@ function Lightbox({
         <p className="lightbox__caption serif">
           <em>{shot.caption}</em>
         </p>
-        <button type="button" className="lightbox__nav" onClick={() => go(1)} aria-label="Nächstes Bild">
+        <button type="button" className="lightbox__nav" onClick={() => go(1)} aria-label={t("Nächstes Bild")}>
           <svg viewBox="0 0 24 24" width="22">
             <path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" strokeWidth="1.4" />
           </svg>

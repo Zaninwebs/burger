@@ -240,3 +240,10 @@ html.intro-done .intro {
     bottom: 32px;
   }
 }
+
+/* the "Direkt aus unserer Küche" caption only exists as a scroll scene */
+@media (prefers-reduced-motion: reduce) {
+  .hero__caption {
+    display: none;
+  }
+}

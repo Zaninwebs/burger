@@ -1,5 +1,6 @@
 import { useRef } from "react";
 import type { ImageName } from "../data/images.gen";
+import { useI18n } from "../i18n";
 import { gsap, ScrollTrigger } from "../lib/motion";
 import { Button, Lines, Picture, useGsap } from "./ui";
 import "./Kitchen.css";
@@ -59,6 +60,7 @@ const PLATES: Plate[] = [
 ];
 
 export default function Kitchen() {
+  const { t } = useI18n();
   const root = useRef<HTMLElement>(null);
 
   useGsap(root, ({ reduced, q }) => {
@@ -172,13 +174,13 @@ export default function Kitchen() {
           <header className="kitchen__intro">
             <p className="label eyebrow label--gold">La Cucina</p>
             <h2 id="kitchen-title" className="h2">
-              <Lines lines={["Was aus", <em key="k">unserer Küche</em>, "kommt."]} />
+              <Lines lines={[t("Was aus"), <em key="k">{t("unserer Küche")}</em>, t("kommt.")]} />
             </h2>
             <p className="muted kitchen__lead">
-              Von der Pizza bis zum Dessert. Ein Blick auf die Teller, die jeden Tag den Pass verlassen.
+              {t("Von der Pizza bis zum Dessert. Ein Blick auf die Teller, die jeden Tag den Pass verlassen.")}
             </p>
             <Button href="#speisekarte" variant="ghost" className="on-dark" small>
-              Zur Speisekarte
+              {t("Zur Speisekarte")}
             </Button>
           </header>
 
@@ -187,15 +189,15 @@ export default function Kitchen() {
               <Picture
                 name={p.image}
                 className="plate__frame"
-                alt={p.alt}
+                alt={t(p.alt)}
                 sizes={p.shape === "wide" ? "(min-width: 900px) 52vw, 92vw" : "(min-width: 900px) 30vw, 92vw"}
               />
               <figcaption className="plate__caption">
                 <span className="plate__title serif">
                   <em>{p.italian}</em>
                 </span>
-                <span className="plate__german label">{p.german}</span>
-                <span className="plate__line muted">{p.line}</span>
+                <span className="plate__german label">{t(p.german)}</span>
+                <span className="plate__line muted">{t(p.line)}</span>
               </figcaption>
             </figure>
           ))}
@@ -205,7 +207,7 @@ export default function Kitchen() {
               <em>Buon</em> appetito.
             </p>
             <Button href="#reservieren" variant="gold" cursor="Reserve">
-              Tisch reservieren
+              {t("Tisch reservieren")}
             </Button>
           </div>
         </div>

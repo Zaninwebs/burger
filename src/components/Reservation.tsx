@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { DEFAULT_SETTINGS, addDays, berlinNow, validateReservation, type FieldErrors } from "../../shared/reservations";
 import { business } from "../data/content";
 import { api, ApiError, formatDateLong, IS_DEMO } from "../lib/api";
+import { getLang, translate, useI18n } from "../i18n";
 import { gsap, prefersReducedMotion } from "../lib/motion";
 import { site } from "../lib/paths";
 import { OCCASION_EVENT } from "./Events";
@@ -11,6 +12,7 @@ import "./Reservation.css";
 const EMPTY = { name: "", phone: "", date: "", time: "", guests: "", email: "", message: "", website: "" };
 
 export default function Reservation() {
+  const { t, locale } = useI18n();
   const root = useRef<HTMLElement>(null);
   const card = useRef<HTMLDivElement>(null);
   const [f, setF] = useState(EMPTY);
@@ -38,7 +40,7 @@ export default function Reservation() {
 
   // "Feier anfragen" starts the message for the guest
   useEffect(() => {
-    const on = () => setF((x) => ({ ...x, message: x.message || "Anfrage für eine Feier: " }));
+    const on = () => setF((x) => ({ ...x, message: x.message || translate(getLang(), "Anfrage für eine Feier: ") }));
     window.addEventListener(OCCASION_EVENT, on);
     return () => window.removeEventListener(OCCASION_EVENT, on);
   }, []);
@@ -92,7 +94,7 @@ export default function Reservation() {
   const err = (k: keyof FieldErrors) =>
     errors[k] ? (
       <p id={`r-${k}-err`} className="field-error" role="alert">
-        {errors[k]}
+        {t(errors[k]!)}
       </p>
     ) : null;
   const aria = (k: keyof FieldErrors) => ({ "aria-invalid": !!errors[k], "aria-describedby": errors[k] ? `r-${k}-err` : undefined });
@@ -103,58 +105,58 @@ export default function Reservation() {
         <div className="resv__intro">
           <p className="label eyebrow label--gold">Prenotazione</p>
           <h2 id="resv-title" className="h2 resv__title">
-            <Lines lines={["Tisch", <em key="r">reservieren.</em>]} />
+            <Lines lines={[t("Tisch"), <em key="r">{t("reservieren.")}</em>]} />
           </h2>
           <p className="resv__lead">
-            Füllen Sie das Formular aus – wir bestätigen Ihre Reservierung telefonisch oder per E-Mail. Für Gruppen über{" "}
-            {maxParty} Personen rufen Sie uns bitte an: <strong>{business.phoneDisplay}</strong>
+            {t("Füllen Sie das Formular aus – wir bestätigen Ihre Reservierung telefonisch oder per E-Mail. Für Gruppen über {n} Personen rufen Sie uns bitte an:", { n: maxParty })}{" "}
+            <strong>{business.phoneDisplay}</strong>
           </p>
           <p className="resv__hours">
-            Reservierungen zwischen {openFrom} und {openUntil} Uhr
+            {t("Reservierungen zwischen {from} und {until} Uhr", { from: openFrom, until: openUntil })}
           </p>
         </div>
 
         <div className="resv__card" ref={card} tabIndex={-1} aria-live="polite">
           {phase === "sent" ? (
             <div className="resv-done">
-              <p className="label label--gold">Anfrage gesendet</p>
+              <p className="label label--gold">{t("Anfrage gesendet")}</p>
               <p className="resv-done__title h2">
                 <em>Grazie</em>, {f.name.split(" ")[0]}.
               </p>
               <p className="resv-done__summary">
-                {formatDateLong(f.date)} · {f.time} Uhr · {f.guests} {f.guests === "1" ? "Person" : "Personen"}
+                {formatDateLong(f.date, locale)} · {t("{time} Uhr", { time: f.time })} · {f.guests} {f.guests === "1" ? t("Person") : t("Personen")}
               </p>
               <p className="muted">
-                Wir melden uns zur Bestätigung. Bis dahin ist die Reservierung noch nicht verbindlich.
+                {t("Wir melden uns zur Bestätigung. Bis dahin ist die Reservierung noch nicht verbindlich.")}
               </p>
-              {IS_DEMO && <p className="resv-demo">Demo-Version: Diese Anfrage wurde nicht wirklich gesendet.</p>}
+              {IS_DEMO && <p className="resv-demo">{t("Demo-Version: Diese Anfrage wurde nicht wirklich gesendet.")}</p>}
               <Button onClick={reset} variant="ghost" className="on-dark" small>
-                Weitere Anfrage
+                {t("Weitere Anfrage")}
               </Button>
             </div>
           ) : (
             <form className="resv-form" onSubmit={submit} noValidate>
               <div className={`field ${errors.name ? "has-error" : ""}`}>
-                <label htmlFor="r-name">Name</label>
-                <input id="r-name" name="name" autoComplete="name" placeholder="Vor- und Nachname" value={f.name} onChange={change("name")} maxLength={80} {...aria("name")} />
+                <label htmlFor="r-name">{t("Name")}</label>
+                <input id="r-name" name="name" autoComplete="name" placeholder={t("Vor- und Nachname")} value={f.name} onChange={change("name")} maxLength={80} {...aria("name")} />
                 {err("name")}
               </div>
 
               <div className={`field ${errors.phone ? "has-error" : ""}`}>
-                <label htmlFor="r-phone">Telefon</label>
-                <input id="r-phone" name="phone" type="tel" inputMode="tel" autoComplete="tel" placeholder="Für Rückfragen" value={f.phone} onChange={change("phone")} maxLength={24} {...aria("phone")} />
+                <label htmlFor="r-phone">{t("Telefon")}</label>
+                <input id="r-phone" name="phone" type="tel" inputMode="tel" autoComplete="tel" placeholder={t("Für Rückfragen")} value={f.phone} onChange={change("phone")} maxLength={24} {...aria("phone")} />
                 {err("phone")}
               </div>
 
               <div className="field-row">
                 <div className={`field ${errors.date ? "has-error" : ""}`}>
-                  <label htmlFor="r-date">Datum</label>
+                  <label htmlFor="r-date">{t("Datum")}</label>
                   <input id="r-date" name="date" type="date" min={today} max={lastDay} value={f.date} onChange={change("date")} {...aria("date")} />
                   {err("date")}
                 </div>
 
                 <div className={`field ${errors.time ? "has-error" : ""}`}>
-                  <label htmlFor="r-time">Uhrzeit</label>
+                  <label htmlFor="r-time">{t("Uhrzeit")}</label>
                   <input
                     id="r-time"
                     name="time"
@@ -171,12 +173,12 @@ export default function Reservation() {
               </div>
 
               <div className={`field ${errors.guests ? "has-error" : ""}`}>
-                <label htmlFor="r-guests">Personen</label>
+                <label htmlFor="r-guests">{t("Personen")}</label>
                 <select id="r-guests" name="guests" value={f.guests} onChange={change("guests")} {...aria("guests")}>
-                  <option value="">Anzahl wählen</option>
+                  <option value="">{t("Anzahl wählen")}</option>
                   {Array.from({ length: maxParty }, (_, i) => i + 1).map((n) => (
                     <option key={n} value={n}>
-                      {n} {n === 1 ? "Person" : "Personen"}
+                      {n} {n === 1 ? t("Person") : t("Personen")}
                     </option>
                   ))}
                 </select>
@@ -184,14 +186,14 @@ export default function Reservation() {
               </div>
 
               <div className={`field ${errors.email ? "has-error" : ""}`}>
-                <label htmlFor="r-email">E-Mail</label>
-                <input id="r-email" name="email" type="email" inputMode="email" autoComplete="email" placeholder="Für die Bestätigung" value={f.email} onChange={change("email")} maxLength={120} {...aria("email")} />
+                <label htmlFor="r-email">{t("E-Mail")}</label>
+                <input id="r-email" name="email" type="email" inputMode="email" autoComplete="email" placeholder={t("Für die Bestätigung")} value={f.email} onChange={change("email")} maxLength={120} {...aria("email")} />
                 {err("email")}
               </div>
 
               <div className={`field ${errors.message ? "has-error" : ""}`}>
-                <label htmlFor="r-message">Anmerkungen</label>
-                <textarea id="r-message" name="message" rows={3} placeholder="Allergien, Wünsche, Anlass …" value={f.message} onChange={change("message")} maxLength={600} {...aria("message")} />
+                <label htmlFor="r-message">{t("Anmerkungen")}</label>
+                <textarea id="r-message" name="message" rows={3} placeholder={t("Allergien, Wünsche, Anlass …")} value={f.message} onChange={change("message")} maxLength={600} {...aria("message")} />
                 {err("message")}
               </div>
 
@@ -214,9 +216,9 @@ export default function Reservation() {
                 />
                 <span className="consent__box" aria-hidden="true" />
                 <span>
-                  Ich bin einverstanden, dass meine Angaben zur Bearbeitung der Anfrage gespeichert werden (
+                  {t("Ich bin einverstanden, dass meine Angaben zur Bearbeitung der Anfrage gespeichert werden")} (
                   <a className="link link--static" href={site("datenschutz/index.html")} target="_blank" rel="noopener">
-                    Datenschutz
+                    {t("Datenschutz")}
                   </a>
                   ).
                 </span>
@@ -225,11 +227,11 @@ export default function Reservation() {
 
               {formError && (
                 <p className="form-error" role="alert">
-                  {formError}
+                  {t(formError)}
                 </p>
               )}
               <Button type="submit" variant="gold" disabled={phase === "sending"} cursor="Reserve" className="resv-form__submit">
-                {phase === "sending" ? "Wird gesendet …" : "Reservierung anfragen"}
+                {phase === "sending" ? t("Wird gesendet …") : t("Reservierung anfragen")}
               </Button>
             </form>
           )}

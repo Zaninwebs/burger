@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { business } from "../data/content";
+import { useI18n } from "../i18n";
 import { gsap, prefersReducedMotion, scrollToHash, stopScroll } from "../lib/motion";
 import Emblem from "./Emblem";
 import { OpenBadge, ScrollMouse } from "./Icons";
@@ -22,6 +23,7 @@ function archClip(vw: number, vh: number): string {
 const FULL = "inset(0px 0px 0px 0px round 0px 0px 0px 0px)";
 
 export default function Hero() {
+  const { t } = useI18n();
   const root = useRef<HTMLElement>(null);
   const video = useRef<HTMLVideoElement>(null);
   const [introDone, setIntroDone] = useState(false);
@@ -205,15 +207,14 @@ export default function Hero() {
           </h1>
           <p className="hero__tagline label hero__reveal">Cucina Italiana</p>
           <p className="hero__text hero__reveal">
-            Italienisches Lebensgefühl und herzliche Gastfreundschaft. Vom Frühstück bis zum Abendessen — mitten in
-            Wiesdorf.
+            {t("Italienisches Lebensgefühl und herzliche Gastfreundschaft. Vom Frühstück bis zum Abendessen — mitten in Wiesdorf.")}
           </p>
           <div className="hero__ctas hero__reveal">
             <Button href="#reservieren" variant="gold" cursor="Reserve">
-              Tisch reservieren
+              {t("Tisch reservieren")}
             </Button>
             <Button href="#restaurant" variant="ghost" className="on-dark" arrow={false}>
-              Entdecke Casa Ducale
+              {t("Entdecke Casa Ducale")}
             </Button>
           </div>
           <OpenBadge className="hero__reveal hero__status" />
@@ -222,7 +223,7 @@ export default function Hero() {
         <div className="hero__caption" aria-hidden={!introDone}>
           <p className="label label--gold">La Cucina</p>
           <p className="hero__caption-text display">
-            <Lines lines={["Direkt aus", <em key="k">unserer Küche.</em>]} />
+            <Lines lines={[t("Direkt aus"), <em key="k">{t("unserer Küche.")}</em>]} />
           </p>
         </div>
 
@@ -230,7 +231,7 @@ export default function Hero() {
           <a
             className="hero__scroll"
             href="#restaurant"
-            aria-label="Nach unten scrollen"
+            aria-label={t("Nach unten scrollen")}
             onClick={(e) => {
               e.preventDefault();
               scrollToHash("#restaurant");
@@ -239,7 +240,7 @@ export default function Hero() {
             <ScrollMouse />
           </a>
           <button className="hero__play label" type="button" onClick={togglePlay} aria-pressed={paused}>
-            {paused ? "Video abspielen" : "Video pausieren"}
+            {paused ? t("Video abspielen") : t("Video pausieren")}
           </button>
         </div>
       </div>

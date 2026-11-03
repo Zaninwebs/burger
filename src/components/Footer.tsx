@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { business, fullAddress, hours } from "../data/content";
+import { useI18n } from "../i18n";
 import { gsap } from "../lib/motion";
 import { site } from "../lib/paths";
 import Emblem from "./Emblem";
@@ -21,6 +22,7 @@ function readConsent(): boolean {
 
 /** Contact + map + footer in one calm block. */
 export default function Footer() {
+  const { t } = useI18n();
   const root = useRef<HTMLElement>(null);
   const [showMap, setShowMap] = useState(readConsent);
 
@@ -63,7 +65,7 @@ export default function Footer() {
                 <PinIcon />
               </span>
               <div>
-                <p className="contact-item__label">Adresse</p>
+                <p className="contact-item__label">{t("Adresse")}</p>
                 <p>{business.street}</p>
                 <p>
                   {business.postalCode} {business.city}-{business.district}
@@ -75,21 +77,21 @@ export default function Footer() {
                 <ClockIcon />
               </span>
               <div>
-                <p className="contact-item__label">Öffnungszeiten</p>
+                <p className="contact-item__label">{t("Öffnungszeiten")}</p>
                 {hours.map((h) => (
                   <p key={h.days}>
-                    {h.days}: {h.time ? `${h.time} Uhr` : h.note}
+                    {t(h.days)}: {h.time ? t("{time} Uhr", { time: h.time }) : t(h.note ?? "")}
                   </p>
                 ))}
                 <OpenBadge className="contact-item__status" />
               </div>
             </li>
             <li className="contact-item contact-item--options">
-              <ContactOptions title="Kontakt" />
+              <ContactOptions title={t("Kontakt")} />
             </li>
             <li className="contact-item contact-item--cta">
               <Button href="#reservieren" variant="gold" cursor="Reserve">
-                Tisch reservieren
+                {t("Tisch reservieren")}
               </Button>
             </li>
           </ul>
@@ -98,7 +100,7 @@ export default function Footer() {
             {showMap ? (
               <iframe
                 className="map-card__frame"
-                title={`Karte: ${fullAddress}`}
+                title={t("Karte: {address}", { address: fullAddress })}
                 src={MAP_EMBED}
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
@@ -118,18 +120,18 @@ export default function Footer() {
             )}
             <div className="map-card__bar">
               <a className="map-card__route" href={business.mapsUrl} target="_blank" rel="noopener noreferrer">
-                Route in Google Maps öffnen ↗
+                {t("Route in Google Maps öffnen")} ↗
               </a>
               {!showMap && (
                 <button type="button" className="map-card__load" onClick={loadMap}>
-                  Karte hier anzeigen
+                  {t("Karte hier anzeigen")}
                 </button>
               )}
             </div>
             {!showMap && (
               <p className="map-card__note">
-                Beim Anzeigen der Karte werden Daten an Google übertragen (
-                <a href={site("datenschutz/index.html")}>Datenschutz</a>).
+                {t("Beim Anzeigen der Karte werden Daten an Google übertragen")} (
+                <a href={site("datenschutz/index.html")}>{t("Datenschutz")}</a>).
               </p>
             )}
           </div>
@@ -138,10 +140,10 @@ export default function Footer() {
         <div className="footer__bottom">
           <span>© {new Date().getFullYear()} Casa Ducale</span>
           <a className="link" href={site("impressum/index.html")}>
-            Impressum
+            {t("Impressum")}
           </a>
           <a className="link" href={site("datenschutz/index.html")}>
-            Datenschutz
+            {t("Datenschutz")}
           </a>
         </div>
       </div>

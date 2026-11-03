@@ -1,5 +1,6 @@
 import { useRef } from "react";
 import { business, events } from "../data/content";
+import { useI18n } from "../i18n";
 import { gsap } from "../lib/motion";
 import { Button, Lines, Picture, revealOnScroll, useGsap } from "./ui";
 import "./Events.css";
@@ -7,6 +8,7 @@ import "./Events.css";
 export const OCCASION_EVENT = "cd:occasion";
 
 export default function Events() {
+  const { t } = useI18n();
   const root = useRef<HTMLElement>(null);
 
   useGsap(root, ({ reduced, q }) => {
@@ -48,25 +50,25 @@ export default function Events() {
     <section id="feiern" ref={root} className="events" aria-labelledby="events-title">
       <div className="container events__grid">
         <div className="events__head">
-          <p className="label eyebrow events__eyebrow">Feste &amp; Catering</p>
+          <p className="label eyebrow events__eyebrow">{t("Feste & Catering")}</p>
           <h2 id="events-title" className="h2 events__title">
-            <Lines lines={["Feiern bei", <em key="c">Casa Ducale.</em>]} />
+            <Lines lines={[t("Feiern bei"), <em key="c">Casa Ducale.</em>]} />
           </h2>
-          <p className="lead events__lead">{events.lead}</p>
-          <ul className="events__list" aria-label="Anlässe">
+          <p className="lead events__lead">{t(events.lead)}</p>
+          <ul className="events__list" aria-label={t("Anlässe")}>
             {events.occasions.map((o) => (
               <li key={o} className="occasion">
                 <span className="occasion__dot" aria-hidden="true" />
-                {o}
+                {t(o)}
               </li>
             ))}
           </ul>
           <div className="events__ctas">
             <Button href="#reservieren" onClick={requestEvent} cursor="Reserve">
-              Feier anfragen
+              {t("Feier anfragen")}
             </Button>
             <a className="link link--static events__phone" href={business.phoneHref}>
-              oder anrufen: {business.phoneDisplay}
+              {t("oder anrufen:")} {business.phoneDisplay}
             </a>
           </div>
         </div>
@@ -75,25 +77,25 @@ export default function Events() {
           <Picture
             name="buffet-frutta"
             className="events__img events__img--a"
-            alt="Festlich angerichtetes Obstbuffet mit Windlichtern vor dem Wandbild einer italienischen Piazza"
+            alt={t("Festlich angerichtetes Obstbuffet mit Windlichtern vor dem Wandbild einer italienischen Piazza")}
             sizes="(min-width: 900px) 26vw, 56vw"
           />
           <Picture
             name="buffet-antipasti"
             className="events__img events__img--b"
-            alt="Catering-Buffet mit Lachs-Crostini, Caprese-Spießen, Salaten, Käse und Aufschnitt"
+            alt={t("Catering-Buffet mit Lachs-Crostini, Caprese-Spießen, Salaten, Käse und Aufschnitt")}
             sizes="(min-width: 900px) 22vw, 44vw"
           />
           <Picture
             name="sala-natale"
             className="events__img events__img--c"
-            alt="Festlich gedeckte lange Tafeln im Restaurant zur Weihnachtszeit"
+            alt={t("Festlich gedeckte lange Tafeln im Restaurant zur Weihnachtszeit")}
             sizes="(min-width: 900px) 30vw, 64vw"
           />
           <Picture
             name="sala-festa"
             className="events__img events__img--d"
-            alt="Für eine Geburtstagsfeier dekorierter Gastraum mit Ballons und gedeckten Tischen"
+            alt={t("Für eine Geburtstagsfeier dekorierter Gastraum mit Ballons und gedeckten Tischen")}
             sizes="(min-width: 900px) 22vw, 44vw"
           />
         </div>
