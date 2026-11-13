@@ -2,6 +2,7 @@ import Navbar from "./components/Navbar";
 import Menu from "./components/Menu";
 import Footer from "./components/Footer";
 import MobileActionBar from "./components/MobileActionBar";
+import Assistant from "./components/Assistant";
 import { useReveal } from "./hooks/useReveal";
 
 /** The /speisekarte/ page: the full menu on its own, so the home page stays simple. */
@@ -19,6 +20,7 @@ export default function MenuApp() {
       </main>
       <Footer />
       <MobileActionBar />
+      <Assistant />
     </>
   );
 }

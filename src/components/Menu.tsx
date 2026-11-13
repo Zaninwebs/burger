@@ -88,9 +88,17 @@ export default function Menu() {
         history.replaceState(null, "", "#speisekarte");
       }
     };
-    if (location.hash.startsWith("#kategorie-")) open(location.hash.slice("#kategorie-".length));
+    // e.g. the assistant linking to /speisekarte/#kategorie-pizza while already on this page
+    const onHash = () => {
+      if (location.hash.startsWith("#kategorie-")) open(location.hash.slice("#kategorie-".length));
+    };
+    onHash();
     document.addEventListener("click", onClick);
-    return () => document.removeEventListener("click", onClick);
+    window.addEventListener("hashchange", onHash);
+    return () => {
+      document.removeEventListener("click", onClick);
+      window.removeEventListener("hashchange", onHash);
+    };
   }, []);
 
   // Keep the active tab visible inside the horizontal bar without moving the page.

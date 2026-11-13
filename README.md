@@ -34,11 +34,23 @@ npm run preview  # Produktions-Build lokal ansehen
 | Kategorie-Illustrationen (Logo-Stil) | `src/components/FoodIcon.tsx` |
 | Startseite / Speisekarte | `src/App.tsx` / `src/MenuApp.tsx` (`/speisekarte/`) |
 | Bewertungen + Google-Rating | `src/data/reviews.ts` |
+| Rialto-Assistent (Antworten, Stichwörter) | `src/lib/assistant.ts`, Oberfläche `src/components/Assistant.tsx` |
 | SEO-Meta, JSON-LD | `index.html` |
 | Impressum / Datenschutz | `impressum/index.html`, `datenschutz/index.html` |
 
 Wenn sich Öffnungszeiten, Telefonnummer oder Adresse ändern, bitte auch das JSON-LD in `index.html`
 anpassen. Name, Adresse und Telefon (NAP) müssen überall identisch sein, auch im Google-Unternehmensprofil.
+
+## Rialto-Assistent
+
+Der Chat-Button unten rechts beantwortet Fragen direkt im Browser, nur mit den Daten dieser Seite
+(Speisekarte, Preise, Öffnungszeiten, Adresse, Telefon). Es gibt keinen Server, keine Kosten und
+keine Weitergabe von Eingaben. Er erfindet nichts: Allergene, Zahlungsarten und alles Unbekannte
+gehen ans Telefon. Er sagt zu Beginn, dass er ein Programm ist (Transparenz nach EU AI Act).
+
+Funktionen: Gerichtesuche nach Name, Zutat oder Nummer, Preisfilter („unter 10 €“), günstigste
+Gerichte, „Überrasch mich“, Vorschläge für Gruppen mit Budget („4 Personen, 40 €“), Öffnungsstatus
+live und ein Bestellzettel mit Summe, den man beim Anrufen vorliest.
 
 ## Vor dem Launch bestätigen
 

@@ -12,6 +12,10 @@ const paths = {
   bag: "M6 8h12l-1 12H7L6 8zM9 8V6a3 3 0 0 1 6 0v2",
   star: "M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z",
   book: "M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2V5zM4 19a2 2 0 0 1 2-2h13",
+  chat: "M4 5h16v11H9l-5 4V5zM8 9.5h8M8 12.5h5",
+  note: "M6 3h9l3 3v15H6V3zM9 9h6M9 13h6M9 17h3",
+  plus: "M12 5v14M5 12h14",
+  minus: "M5 12h14",
 } as const;
 
 export type IconName = keyof typeof paths;

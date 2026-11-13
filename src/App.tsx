@@ -8,6 +8,7 @@ import OrderSection from "./components/OrderSection";
 import Location from "./components/Location";
 import Footer from "./components/Footer";
 import MobileActionBar from "./components/MobileActionBar";
+import Assistant from "./components/Assistant";
 import { useReveal } from "./hooks/useReveal";
 
 export default function App() {
@@ -30,6 +31,7 @@ export default function App() {
       </main>
       <Footer />
       <MobileActionBar />
+      <Assistant />
     </>
   );
 }
