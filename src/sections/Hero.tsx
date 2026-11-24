@@ -17,8 +17,8 @@ const Chars = ({ text }: { text: string }) => (
   </span>
 )
 
-// Reihenfolge wie vom Inhaber gewünscht: Föhnen, Bart, Logo
-const SLIDES: ImageId[] = ['simyan-foehnen', 'simyan-bart', 'logo-gold']
+// Nur das Logo, wie vom Inhaber gewünscht
+const SLIDES: ImageId[] = ['logo-gold']
 /** Querformat-Bilder werden vollständig gezeigt statt beschnitten. */
 const CONTAIN: ImageId[] = ['logo-gold']
 
@@ -73,7 +73,7 @@ export function Hero({ start }: { start: boolean }) {
 
   // Langsamer Bildwechsel (Crossfade + Ken-Burns)
   useEffect(() => {
-    if (!start || prefersReducedMotion()) return
+    if (!start || prefersReducedMotion() || SLIDES.length < 2) return
     const id = setInterval(() => setSlide((s) => (s + 1) % SLIDES.length), 6000)
     return () => clearInterval(id)
   }, [start])
@@ -132,13 +132,15 @@ export function Hero({ start }: { start: boolean }) {
               ))}
             </div>
           </div>
-          <div className="hero__counter hero__fade" aria-hidden="true">
-            <span>0{slide + 1}</span>
-            <i>
-              <b key={slide} />
-            </i>
-            <span>0{SLIDES.length}</span>
-          </div>
+          {SLIDES.length > 1 && (
+            <div className="hero__counter hero__fade" aria-hidden="true">
+              <span>0{slide + 1}</span>
+              <i>
+                <b key={slide} />
+              </i>
+              <span>0{SLIDES.length}</span>
+            </div>
+          )}
         </div>
 
         <div className="hero__bottom">

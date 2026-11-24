@@ -403,7 +403,7 @@
   margin-top: 1vh;
   overflow: hidden;
   background: var(--bg-2);
-  border-radius: 999px 999px 0 0;
+  border-radius: 4px;
 }
 .hero__media-move {
   position: absolute;
@@ -560,7 +560,7 @@
     min-height: 0;
     height: 54svh;
     margin: 0;
-    border-radius: 200px 200px 0 0;
+    border-radius: 4px;
   }
   .hero__media::after {
     content: '';
@@ -664,7 +664,7 @@
 }
 .story__img {
   aspect-ratio: 3 / 4;
-  border-radius: 999px 999px 0 0;
+  border-radius: 4px;
 }
 .img__parallax {
   position: absolute;
@@ -981,7 +981,7 @@
   margin-bottom: 2vh;
 }
 .color__card--1 .img {
-  border-radius: 999px 999px 0 0;
+  border-radius: 4px;
 }
 .color__card figcaption {
   display: flex;
