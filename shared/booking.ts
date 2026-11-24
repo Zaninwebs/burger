@@ -40,6 +40,19 @@ export const BOOKABLE_SERVICES = [
   'Etwas anderes / Beratung',
 ] as const
 
+/** Trenner, wenn mehrere Leistungen gewählt wurden. */
+export const SERVICE_SEPARATOR = ' + '
+
+/** Prüft eine (ggf. mehrteilige) Leistungsangabe: nur bekannte Leistungen, keine doppelt. */
+export function isValidServiceList(value: string): boolean {
+  const parts = value.split(SERVICE_SEPARATOR)
+  return (
+    parts.length > 0 &&
+    new Set(parts).size === parts.length &&
+    parts.every((p) => (BOOKABLE_SERVICES as readonly string[]).includes(p))
+  )
+}
+
 /** Mitarbeiter, die Kunden für ihren Termin wählen können. */
 export const STAFF = [
   { id: 'simyan', name: 'Simyan', role: 'Inhaber & Friseurmeister' },

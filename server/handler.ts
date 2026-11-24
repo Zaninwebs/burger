@@ -1,5 +1,5 @@
 import {
-  BOOKABLE_SERVICES,
+  isValidServiceList,
   BOOKING_HORIZON_DAYS,
   DAY_MODES,
   REQUEST_STATUSES,
@@ -283,7 +283,7 @@ export function createHandler(deps: HandlerDeps) {
     const phone = clean(input.phone, 30)
     const email = clean(input.email, 120).toLowerCase()
     const message = clean(input.message, 1000)
-    const service = clean(input.service, 80)
+    const service = clean(input.service, 400)
     const staff = isStaffId(input.staff) ? input.staff : null
     const date = input.date
     const time = input.time ? clean(input.time, 5) : null
@@ -292,7 +292,7 @@ export function createHandler(deps: HandlerDeps) {
     if (name.length < 2) errors.name = 'Bitte geben Sie Ihren Namen an.'
     if (!PHONE.test(phone)) errors.phone = 'Bitte geben Sie eine gültige Telefonnummer an.'
     if (email && !EMAIL.test(email)) errors.email = 'Diese E-Mail-Adresse scheint nicht zu stimmen.'
-    if (!(BOOKABLE_SERVICES as readonly string[]).includes(service)) errors.service = 'Bitte wählen Sie eine Leistung.'
+    if (!isValidServiceList(service)) errors.service = 'Bitte wählen Sie eine Leistung.'
     if (input.consent !== true) errors.consent = 'Bitte bestätigen Sie die Datenschutzhinweise.'
     if (!isIsoDate(date)) errors.date = 'Bitte wählen Sie einen Tag.'
     if (!time) errors.time = 'Bitte wählen Sie eine Uhrzeit.'

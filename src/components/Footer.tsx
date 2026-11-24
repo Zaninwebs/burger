@@ -162,6 +162,9 @@ export function Footer({ home = true }: { home?: boolean }) {
             )}
           </nav>
         </div>
+        <p className="footer__credit">
+          Website erstellt von <strong>Zaninweb</strong>
+        </p>
       </div>
     </footer>
   )

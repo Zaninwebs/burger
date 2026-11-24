@@ -1,42 +1,26 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef } from 'react'
 import { Button } from '../components/Button'
 import { GoldDust } from '../components/GoldDust'
 import { Img } from '../components/Img'
 import { business } from '../data/content'
-import type { ImageId } from '../data/images.generated'
+import { asset } from '../lib/site'
 import { gsap, isFinePointer, prefersReducedMotion } from '../lib/motion'
 
-/** Zerlegt ein Wort in einzeln animierbare Buchstaben. */
-const Chars = ({ text }: { text: string }) => (
-  <span aria-hidden="true">
-    {text.split('').map((c, i) => (
-      <span key={i} className="hero__char">
-        {c === ' ' ? '\u00a0' : c}
-      </span>
-    ))}
-  </span>
-)
-
-// Nur das Logo, wie vom Inhaber gewünscht
-const SLIDES: ImageId[] = ['logo-gold']
-/** Querformat-Bilder werden vollständig gezeigt statt beschnitten. */
-const CONTAIN: ImageId[] = ['logo-gold']
-
+/**
+ * Startbereich: das goldene Logo als hochauflösender Vollbild-Hintergrund.
+ * Eine unscharfe Kopie füllt jedes Bildschirmformat, darüber liegt das
+ * scharfe Bild mit weich auslaufenden Rändern und einem Lichtschimmer,
+ * der nur über die goldenen Buchstaben wandert.
+ */
 export function Hero({ start }: { start: boolean }) {
   const root = useRef<HTMLElement>(null)
-  const [slide, setSlide] = useState(0)
-  // Folgebilder erst laden, kurz bevor sie gebraucht werden (spart mobile Daten)
-  const [reached, setReached] = useState(0)
-  useEffect(() => setReached((r) => Math.max(r, slide + 1)), [slide])
 
   // Ausgangszustand vor dem ersten Paint setzen
   useLayoutEffect(() => {
     if (prefersReducedMotion()) return
     const ctx = gsap.context(() => {
-      gsap.set('.hero__char', { yPercent: 120, rotation: 8 })
-      gsap.set('.hero__by', { yPercent: 120 })
-      gsap.set('.hero__media', { clipPath: 'inset(18% 12% 18% 12%)' })
-      gsap.set('.hero__media-inner', { scale: 1.35 })
+      gsap.set('.hero__bg-main', { scale: 1.28, autoAlpha: 0, filter: 'blur(16px) brightness(0.4)' })
+      gsap.set('.hero__bg-fill', { autoAlpha: 0 })
       gsap.set('.hero__fade', { autoAlpha: 0, y: 24 })
       gsap.set('.hero__rule', { scaleX: 0 })
     }, root)
@@ -48,22 +32,23 @@ export function Hero({ start }: { start: boolean }) {
     if (!start || prefersReducedMotion()) return
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({ defaults: { ease: 'expo.out' } })
-      tl.to('.hero__media', { clipPath: 'inset(0% 0% 0% 0%)', duration: 1.8, ease: 'expo.inOut' }, 0)
-        .to('.hero__media-inner', { scale: 1, duration: 2.6 }, 0.2)
-        .to('.hero__char', { yPercent: 0, rotation: 0, duration: 1.4, stagger: 0.045 }, 0.35)
-        .to('.hero__by', { yPercent: 0, duration: 1.4 }, 0.8)
-        .to('.hero__rule', { scaleX: 1, duration: 1.6, ease: 'expo.inOut' }, 0.6)
-        .to('.hero__fade', { autoAlpha: 1, y: 0, duration: 1.2, stagger: 0.08 }, 0.9)
+      tl.to('.hero__bg-fill', { autoAlpha: 1, duration: 1.6, ease: 'power2.out' }, 0)
+        .to('.hero__bg-main', { autoAlpha: 1, duration: 1.4, ease: 'power2.out' }, 0.1)
+        .to('.hero__bg-main', { scale: 1, filter: 'blur(0px) brightness(1)', duration: 3.2 }, 0.1)
+        .add(() => root.current?.classList.add('is-shining'), 1.6)
+        .to('.hero__rule', { scaleX: 1, duration: 1.6, ease: 'expo.inOut' }, 1.1)
+        .to('.hero__fade', { autoAlpha: 1, y: 0, duration: 1.2, stagger: 0.1 }, 1.3)
 
-      // Scroll: Bild wandert und zoomt leicht, Headline driftet
-      gsap.to('.hero__media-inner', {
-        yPercent: 12,
+      // Scroll: Hintergrund wandert langsam und zoomt leicht, Inhalt blendet aus
+      gsap.to('.hero__bg-move', {
+        yPercent: 14,
         scale: 1.08,
         ease: 'none',
         scrollTrigger: { trigger: root.current, start: 'top top', end: 'bottom top', scrub: true },
       })
-      gsap.to('.hero__title', {
-        yPercent: -18,
+      gsap.to('.hero__content', {
+        yPercent: -10,
+        autoAlpha: 0.2,
         ease: 'none',
         scrollTrigger: { trigger: root.current, start: 'top top', end: 'bottom top', scrub: true },
       })
@@ -71,23 +56,16 @@ export function Hero({ start }: { start: boolean }) {
     return () => ctx.revert()
   }, [start])
 
-  // Langsamer Bildwechsel (Crossfade + Ken-Burns)
-  useEffect(() => {
-    if (!start || prefersReducedMotion() || SLIDES.length < 2) return
-    const id = setInterval(() => setSlide((s) => (s + 1) % SLIDES.length), 6000)
-    return () => clearInterval(id)
-  }, [start])
-
-  // Maus-Parallax auf dem Bild (Desktop)
+  // Maus-Parallax auf dem Logo (Desktop)
   useEffect(() => {
     const el = root.current
     if (!el || !isFinePointer() || prefersReducedMotion()) return
-    const media = el.querySelector('.hero__media-move')
-    if (!media) return
-    const xTo = gsap.quickTo(media, 'x', { duration: 1.6, ease: 'power3.out' })
-    const yTo = gsap.quickTo(media, 'y', { duration: 1.6, ease: 'power3.out' })
+    const main = el.querySelector('.hero__bg-tilt')
+    if (!main) return
+    const xTo = gsap.quickTo(main, 'x', { duration: 1.8, ease: 'power3.out' })
+    const yTo = gsap.quickTo(main, 'y', { duration: 1.8, ease: 'power3.out' })
     const move = (e: PointerEvent) => {
-      xTo((e.clientX / innerWidth - 0.5) * -24)
+      xTo((e.clientX / innerWidth - 0.5) * -26)
       yTo((e.clientY / innerHeight - 0.5) * -18)
     }
     el.addEventListener('pointermove', move)
@@ -98,50 +76,34 @@ export function Hero({ start }: { start: boolean }) {
     <section
       ref={root}
       id="top"
-      className={`hero ${CONTAIN.includes(SLIDES[slide]) ? 'hero--logo' : ''}`}
+      className="hero hero--cinema"
       aria-labelledby="hero-title"
+      style={{ ['--hero-mask' as string]: `url(${asset('img/hero-logo-1200.webp')})` }}
     >
+      <div className="hero__bg" aria-hidden="true">
+        <div className="hero__bg-move">
+          <div className="hero__bg-fill">
+            <Img id="hero-logo" sizes="50vw" priority alt="" />
+          </div>
+          <div className="hero__bg-tilt">
+            <div className="hero__bg-main">
+              <Img id="hero-logo" priority sizes="(orientation: portrait) 148vw, max(100vw, 151svh)" alt="" />
+              <span className="hero__shine" />
+            </div>
+          </div>
+        </div>
+        <div className="hero__vignette" />
+      </div>
       <GoldDust />
-      <div className="hero__glow" aria-hidden="true" />
-      <div className="hero__grid wrap">
+
+      <div className="hero__content wrap">
         <p className="hero__kicker hero__fade">
           Friseurmeister-Salon <span aria-hidden="true">·</span> Leverkusen-{business.district}
         </p>
 
-        <h1 id="hero-title" className="hero__title display" aria-label="Art of Hair by Simyan">
-          <span className="hero__line">
-            <Chars text="Art of" />
-          </span>
-          <span className="hero__line hero__line--indent">
-            <Chars text="Hair" />
-          </span>
-          <span className="hero__line hero__line--by">
-            <span aria-hidden="true" className="hero__by">
-              <em>by Simyan</em>
-            </span>
-          </span>
+        <h1 id="hero-title" className="sr-only">
+          Art of Hair by Simyan – Friseur in Leverkusen-{business.district}
         </h1>
-
-        <div className="hero__media" aria-hidden="false">
-          <div className="hero__media-move">
-            <div className="hero__media-inner">
-              {SLIDES.map((id, i) => (
-                <div key={id} className={`hero__slide ${i === slide ? 'is-active' : ''} ${CONTAIN.includes(id) ? 'hero__slide--contain' : ''}`} aria-hidden={i !== slide}>
-                  {i <= reached && <Img id={id} priority={i === 0} sizes="(min-width: 900px) 42vw, 100vw" />}
-                </div>
-              ))}
-            </div>
-          </div>
-          {SLIDES.length > 1 && (
-            <div className="hero__counter hero__fade" aria-hidden="true">
-              <span>0{slide + 1}</span>
-              <i>
-                <b key={slide} />
-              </i>
-              <span>0{SLIDES.length}</span>
-            </div>
-          )}
-        </div>
 
         <div className="hero__bottom">
           <span className="hero__rule" aria-hidden="true" />

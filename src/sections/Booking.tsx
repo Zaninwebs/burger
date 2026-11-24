@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type FormEvent, type ReactNode } from 'react'
 import {
   BOOKABLE_SERVICES,
+  SERVICE_SEPARATOR,
   BOOKING_HORIZON_DAYS,
   STAFF,
   addDays,
@@ -49,7 +50,11 @@ export function Booking() {
   const lastMonth = addDays(today, BOOKING_HORIZON_DAYS).slice(0, 7)
 
   const [step, setStep] = useState(0)
-  const [service, setService] = useState('')
+  const [services, setServices] = useState<string[]>([])
+  // Mehrere Leistungen möglich, z. B. „Herren-Haarschnitt + Bart“
+  const service = BOOKABLE_SERVICES.filter((s) => services.includes(s)).join(SERVICE_SEPARATOR)
+  const toggleService = (s: string) =>
+    setServices((list) => (list.includes(s) ? list.filter((x) => x !== s) : [...list, s]))
   // undefined = noch nicht gewählt, null = egal
   const [staff, setStaff] = useState<string | null | undefined>(undefined)
   const [month, setMonth] = useState(() => (Number(today.slice(8)) > 22 ? shiftMonth(firstMonth, 1) : firstMonth))
@@ -182,7 +187,7 @@ export function Booking() {
   const reset = () => {
     setDone(false)
     setStep(0)
-    setService('')
+    setServices([])
     setStaff(undefined)
     setDate(null)
     setTime(undefined)
@@ -284,16 +289,16 @@ export function Booking() {
 
               {/* Schritt 1 – Leistung */}
               {step === 0 && (
-                <Step title="Was möchten Sie machen lassen?" headingRef={heading}>
-                  <div className="bk__tiles" role="radiogroup" aria-label="Leistung">
+                <Step title="Was möchten Sie machen lassen?" hint="Sie können mehrere Leistungen auswählen. Danach unten auf „Weiter“ tippen." headingRef={heading}>
+                  <div className="bk__tiles" role="group" aria-label="Leistungen">
                     {BOOKABLE_SERVICES.map((s) => (
                       <button
                         key={s}
                         type="button"
-                        role="radio"
-                        aria-checked={service === s}
-                        className={`bk__tile bk-anim ${service === s ? 'is-active' : ''}`}
-                        onClick={() => pick(() => setService(s))}
+                        role="checkbox"
+                        aria-checked={services.includes(s)}
+                        className={`bk__tile bk__tile--multi bk-anim ${services.includes(s) ? 'is-active' : ''}`}
+                        onClick={() => toggleService(s)}
                       >
                         <span>{s}</span>
                         <i aria-hidden="true" />

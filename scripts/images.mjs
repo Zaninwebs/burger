@@ -38,6 +38,8 @@ const IMAGES = [
   { id: 'team-aussen', file: 'team-aussen.jpg', focus: '50% 55%', alt: 'Das Team vor dem Salon in der Lützenkirchener Straße' },
   { id: 'salon-aussen', file: 'salon-eroeffnung.jpg', focus: '50% 40%', alt: 'Außenansicht des Salons Art of Hair by Simyan in Leverkusen-Lützenkirchen' },
   { id: 'ah-wand', file: 'ah-wand.jpg', focus: '50% 30%', alt: 'Beleuchtetes AH-Logo auf der Natursteinwand, darunter Kevin.Murphy Stylingprodukte' },
+  // Vollbild-Hintergrund im Hero: hochskaliert für große und Retina-Bildschirme
+  { id: 'hero-logo', file: 'hero-4-logo.jpg', maxWidth: 2560, extraWidths: [2000], hq: true, focus: '50% 50%', alt: 'Art of Hair by Simyan – goldenes Logo auf dunklem Naturstein' },
   { id: 'logo-gold', file: 'hero-4-logo.jpg', focus: '50% 50%', alt: 'Art of Hair by Simyan – goldenes Logo' },
   { id: 'km-acryl', file: 'km-acryl.jpg', focus: '50% 40%', alt: 'Kevin.Murphy Pflegeprodukte im Salon-Display' },
   { id: 'km-regal', file: 'km-regal-screenshot.jpg', crop: { left: 4, top: 168, width: 982, height: 1382 }, focus: '40% 50%', alt: 'Kevin.Murphy Produktwand im Salon' },
@@ -61,8 +63,8 @@ async function processOne(img) {
   const h0 = meta.height
   // Kleine Quellen dürfen maximal 2x hochskaliert werden (Lanczos), damit
   // Porträts auf Retina-Displays nicht matschig wirken.
-  const maxW = Math.min(1600, Math.round(w0 * (w0 < 700 ? 2 : 1.5)))
-  const widths = [...new Set(WIDTHS.filter((w) => w < maxW).concat(maxW))].sort((a, b) => a - b)
+  const maxW = img.maxWidth ?? Math.min(1600, Math.round(w0 * (w0 < 700 ? 2 : 1.5)))
+  const widths = [...new Set(WIDTHS.concat(img.extraWidths ?? []).filter((w) => w < maxW).concat(maxW))].sort((a, b) => a - b)
 
   for (const w of widths) {
     const pipeline = () =>
@@ -70,8 +72,8 @@ async function processOne(img) {
         .resize({ width: w, kernel: 'lanczos3' })
         .sharpen({ sigma: w > w0 ? 0.9 : 0.5, m1: 0.6, m2: 2 })
         .modulate({ saturation: 1.02 })
-    await pipeline().avif({ quality: 58, effort: 5 }).toFile(path.join(OUT, `${img.id}-${w}.avif`))
-    await pipeline().webp({ quality: 80, effort: 5 }).toFile(path.join(OUT, `${img.id}-${w}.webp`))
+    await pipeline().avif({ quality: img.hq ? 72 : 58, effort: 5 }).toFile(path.join(OUT, `${img.id}-${w}.avif`))
+    await pipeline().webp({ quality: img.hq ? 90 : 80, effort: 5 }).toFile(path.join(OUT, `${img.id}-${w}.webp`))
   }
 
   const lqip = await sharp(buf).resize({ width: 20 }).blur(1.2).webp({ quality: 40 }).toBuffer()

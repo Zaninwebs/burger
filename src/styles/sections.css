@@ -3801,3 +3801,179 @@
 .footer__insta:hover .footer__insta-arrow {
   transform: translateX(6px);
 }
+
+/* Mehrfachauswahl Leistungen: Kästchen mit Häkchen */
+.bk__tile--multi i {
+  position: relative;
+  border-radius: 6px;
+}
+.bk__tile--multi.is-active i {
+  box-shadow: none;
+}
+.bk__tile--multi.is-active i::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 45%;
+  width: 0.38rem;
+  height: 0.72rem;
+  border: solid var(--bg-deep);
+  border-width: 0 2px 2px 0;
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+/* ==========================================================================
+   Hero (Kino-Variante): Logo als hochauflösender Vollbild-Hintergrund
+   ========================================================================== */
+.hero--cinema {
+  min-height: 100svh;
+  padding-top: 0;
+  background: #0f0e0d;
+}
+.hero__bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.hero__bg-move {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 45%;
+}
+/* Unscharfe Kopie füllt jedes Format (Handy hochkant bis Ultrawide) */
+.hero__bg-fill {
+  position: absolute;
+  inset: -8%;
+  filter: blur(30px) brightness(0.55) saturate(1.15);
+}
+.hero__bg-fill .img,
+.hero__bg-main .img {
+  width: 100%;
+  height: 100%;
+  background-color: transparent;
+}
+.hero__bg-fill img,
+.hero__bg-main img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.hero__bg-tilt {
+  --w: min(max(100vw, 151svh), 182svh);
+  position: absolute;
+  left: 50%;
+  top: 47%;
+  width: var(--w);
+  height: calc(var(--w) * 0.6652);
+  margin: calc(var(--w) * -0.3326) 0 0 calc(var(--w) * -0.5);
+}
+.hero__bg-main {
+  position: absolute;
+  inset: 0;
+  -webkit-mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 64%, transparent 100%);
+  mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 64%, transparent 100%);
+  will-change: transform, filter;
+}
+/* Lichtschimmer, der nur über die goldenen Buchstaben läuft */
+.hero__shine {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background: linear-gradient(
+    108deg,
+    transparent 38%,
+    rgba(255, 238, 200, 0) 44%,
+    rgba(255, 242, 210, 0.95) 50%,
+    rgba(255, 238, 200, 0) 56%,
+    transparent 62%
+  );
+  background-size: 320% 100%;
+  background-position: 120% 0;
+  mix-blend-mode: overlay;
+  -webkit-mask-image: var(--hero-mask);
+  -webkit-mask-size: 100% 100%;
+  mask-image: var(--hero-mask);
+  mask-size: 100% 100%;
+  mask-mode: luminance;
+  transition: opacity 0.8s;
+}
+.hero.is-shining .hero__shine {
+  opacity: 1;
+  animation: hero-shine 7s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+@keyframes hero-shine {
+  0% {
+    background-position: 120% 0;
+  }
+  45%,
+  100% {
+    background-position: -20% 0;
+  }
+}
+.hero__vignette {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 85% 75% at 50% 46%, transparent 45%, rgba(10, 9, 8, 0.6) 100%),
+    linear-gradient(to bottom, rgba(10, 9, 8, 0.6) 0, transparent 20%, transparent 60%, rgba(13, 12, 10, 0.94) 100%);
+}
+.hero__content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 100svh;
+  padding-top: calc(var(--nav-h) + 2vh);
+  padding-bottom: clamp(1.5rem, 4vh, 3rem);
+}
+.hero--cinema .hero__kicker {
+  align-self: center;
+  max-width: none;
+  margin: 1vh 0 0;
+  text-align: center;
+  color: rgba(241, 235, 225, 0.75);
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.6);
+}
+.hero--cinema .hero__intro {
+  color: rgba(241, 235, 225, 0.82);
+  text-shadow: 0 1px 14px rgba(0, 0, 0, 0.7);
+}
+.hero--cinema .hero__rule {
+  background: linear-gradient(90deg, transparent, rgba(207, 171, 112, 0.6), transparent);
+}
+@media (orientation: portrait) {
+  .hero__bg-tilt {
+    --w: 148vw;
+    top: 40%;
+  }
+}
+@media (max-width: 900px) {
+  .hero__content {
+    padding-top: var(--nav-h);
+  }
+  .hero--cinema .hero__kicker {
+    margin-top: 0.75rem;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero__shine {
+    display: none;
+  }
+}
+
+/* Erstellt-von-Hinweis ganz unten */
+.footer__credit {
+  margin: 1.25rem 0 0;
+  text-align: center;
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(244, 239, 231, 0.42);
+}
+.footer__credit strong {
+  font-weight: 600;
+  color: var(--gold-light);
+}
