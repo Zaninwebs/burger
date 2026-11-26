@@ -5,6 +5,8 @@ import { gsap, prefersReducedMotion } from '../lib/motion'
 import { IS_DEMO, siteUrl } from '../lib/site'
 import { Button } from './Button'
 import { GoldDust } from './GoldDust'
+import { openConsent } from '../lib/consent'
+import { CookieBanner } from './CookieBanner'
 
 const SUBPATHS = MONOGRAM_PATH.split(/(?=M)/).filter(Boolean)
 
@@ -155,6 +157,9 @@ export function Footer({ home = true }: { home?: boolean }) {
             <a href={siteUrl('/datenschutz/')} className="link-u">
               Datenschutz
             </a>
+            <button type="button" className="link-u footer__cookie" onClick={openConsent}>
+              Cookie-Einstellungen
+            </button>
             {IS_DEMO && (
               <a href={siteUrl('/admin/')} className="link-u">
                 Inhaber-Login (Demo)
@@ -162,6 +167,7 @@ export function Footer({ home = true }: { home?: boolean }) {
             )}
           </nav>
         </div>
+        <CookieBanner />
         <p className="footer__credit">
           Website erstellt von <strong>Zaninweb</strong>
         </p>

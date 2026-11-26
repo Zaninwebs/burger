@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { business } from '../data/content'
-import { IS_DEMO, siteUrl } from '../lib/site'
+import { onConsentChange, readConsent, saveConsent } from '../lib/consent'
+import { siteUrl } from '../lib/site'
 
 const PinIcon = () => (
   <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -15,7 +16,9 @@ const PinIcon = () => (
  * (Zwei-Klick-Lösung, DSGVO) – vorher wird nichts von Google geladen.
  */
 export function MapRoute() {
-  const [live, setLive] = useState(false)
+  // Karte nur mit Einwilligung „Externe Medien“ (Cookie-Banner oder Knopf unten)
+  const [live, setLive] = useState(() => readConsent()?.media ?? false)
+  useEffect(() => onConsentChange((c) => setLive(c.media)), [])
   const canvas = useRef<HTMLCanvasElement>(null)
 
   // Dezente, animierte Höhenlinien als Platzhalter (keine echten Straßen)
@@ -118,9 +121,9 @@ export function MapRoute() {
               <span className="map__tap">Tippen für die Route →</span>
             </a>
           )}
-          {!live && !IS_DEMO && (
+          {!live && (
             <div className="map__consent">
-              <button type="button" onClick={() => setLive(true)}>
+              <button type="button" onClick={() => saveConsent(true)}>
                 Interaktive Karte laden
               </button>
               <p>

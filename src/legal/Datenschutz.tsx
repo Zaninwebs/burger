@@ -10,8 +10,8 @@ export function Datenschutz() {
 
       <p className="notice">
         Stand: {new Date().toLocaleDateString('de-DE', { month: 'long', year: 'numeric' })}. Diese Website verwendet
-        keine Tracking- oder Analyse-Tools, keine Werbe-Cookies und bindet keine externen Schriftarten, Karten oder
-        Social-Media-Plugins ein.
+        keine Tracking- oder Analyse-Tools und keine Werbe-Cookies. Externe Inhalte (Google Maps) werden nur nach
+        Ihrer Einwilligung geladen.
       </p>
 
       <h2>1. Verantwortlicher</h2>
@@ -74,9 +74,12 @@ export function Datenschutz() {
 
       <h2>5. Cookies und lokale Speicherung</h2>
       <p>
-        Auf den öffentlichen Seiten setzen wir keine Cookies und speichern nichts in Ihrem Browser. Lediglich im
-        Verwaltungsbereich des Salons wird nach der Anmeldung ein technisch notwendiges Sitzungs-Token im Browser des
-        Inhabers abgelegt.
+        Wir setzen keine Tracking- oder Werbe-Cookies. Beim ersten Besuch fragt ein Banner, ob externe Medien
+        (Google Maps) geladen werden dürfen. Ihre Entscheidung (Ja/Nein und Zeitpunkt) speichern wir im lokalen
+        Speicher Ihres Browsers (localStorage), damit der Banner nicht bei jedem Besuch erscheint. Diese Speicherung
+        ist technisch notwendig (§ 25 Abs. 2 Nr. 2 TDDDG). Sie können Ihre Wahl jederzeit über
+        „Cookie-Einstellungen“ unten auf jeder Seite ändern oder widerrufen. Im Verwaltungsbereich des Salons wird
+        nach der Anmeldung zusätzlich ein technisch notwendiges Sitzungs-Token im Browser des Inhabers abgelegt.
       </p>
 
       <h2>6. Schriftarten</h2>
@@ -91,9 +94,9 @@ export function Datenschutz() {
       <h3>Google Maps</h3>
       <p>
         Im Bereich „Anfahrt“ können Sie eine interaktive Karte von Google Maps (Google Ireland Limited, Gordon House,
-        Barrow Street, Dublin 4, Irland) laden. Die Karte wird erst geladen, wenn Sie auf „Interaktive Karte laden“
-        klicken. Dabei werden u. a. Ihre IP-Adresse und technische Daten an Google übertragen, ggf. auch in die USA.
-        Rechtsgrundlage ist Ihre Einwilligung (Art. 6 Abs. 1 lit. a DSGVO), die Sie durch den Klick erteilen.
+        Barrow Street, Dublin 4, Irland) laden. Die Karte wird erst geladen, wenn Sie im Cookie-Banner „Externe
+        Medien“ erlauben oder auf „Interaktive Karte laden“ klicken. Dabei werden u. a. Ihre IP-Adresse und technische Daten an Google übertragen, ggf. auch in die USA.
+        Rechtsgrundlage ist Ihre Einwilligung (Art. 6 Abs. 1 lit. a DSGVO), die Sie jederzeit über „Cookie-Einstellungen“ widerrufen können.
         Weitere Informationen: https://policies.google.com/privacy
       </p>
 

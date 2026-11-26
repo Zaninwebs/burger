@@ -65,8 +65,8 @@ export function App() {
         <Prices />
         <Booking />
         <Marquee items={['Leverkusen', 'Lützenkirchen', 'Di – Fr 9 – 18', 'Sa 9 – 14', 'Art of Hair']} direction={-1} />
-        <Visit />
         <Instagram />
+        <Visit />
         <MapRoute />
       </main>
       <Footer />
