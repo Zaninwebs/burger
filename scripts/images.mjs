@@ -37,6 +37,7 @@ const IMAGES = [
   { id: 'team-salon', file: 'team-salon.jpg', focus: '50% 40%', alt: 'Das Team von Art of Hair by Simyan im Salon vor dem Meisterbrief und dem AH-Logo' },
   { id: 'team-aussen', file: 'team-aussen.jpg', focus: '50% 55%', alt: 'Das Team vor dem Salon in der Lützenkirchener Straße' },
   { id: 'salon-aussen', file: 'salon-eroeffnung.jpg', focus: '50% 40%', alt: 'Außenansicht des Salons Art of Hair by Simyan in Leverkusen-Lützenkirchen' },
+  { id: 'salon-front', file: 'salon-front.jpg', focus: '50% 55%', alt: 'Eingang des Salons Art of Hair by Simyan mit Leuchtschrift über der Tür in der Lützenkirchener Straße' },
   { id: 'ah-wand', file: 'ah-wand.jpg', focus: '50% 30%', alt: 'Beleuchtetes AH-Logo auf der Natursteinwand, darunter Kevin.Murphy Stylingprodukte' },
   // Vollbild-Hintergrund im Hero: hochskaliert für große und Retina-Bildschirme
   { id: 'hero-logo', file: 'hero-4-logo.jpg', maxWidth: 2560, extraWidths: [2000], hq: true, focus: '50% 50%', alt: 'Art of Hair by Simyan – goldenes Logo auf dunklem Naturstein' },

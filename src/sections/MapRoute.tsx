@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { Img } from '../components/Img'
 import { business } from '../data/content'
 import { onConsentChange, readConsent, saveConsent } from '../lib/consent'
 import { siteUrl } from '../lib/site'
@@ -70,6 +71,10 @@ export function MapRoute() {
           <h2 id="map-title" className="h-lg" data-reveal="text">
             So finden Sie <em>zu uns.</em>
           </h2>
+          <figure className="map__photo">
+            <Img id="salon-front" reveal sizes="(min-width: 900px) 36vw, 100vw" />
+            <figcaption>Unser Eingang · {business.street}</figcaption>
+          </figure>
           <address className="map__address" data-reveal="fade">
             {business.name}
             <br />
