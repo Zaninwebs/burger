@@ -3977,3 +3977,171 @@
   font-weight: 600;
   color: var(--gold-light);
 }
+
+/* ==========================================================================
+   Hero (Vektor-Logo): Gold auf dunklem Naturstein, auf jedem Display scharf
+   ========================================================================== */
+.hero--logo-vector {
+  min-height: 100svh;
+  padding-top: 0;
+  background: #121110;
+}
+.hero__stone {
+  position: absolute;
+  inset: -6% 0;
+  background:
+    radial-gradient(120% 90% at 50% 38%, #2a2824 0%, #1c1b19 45%, #121110 100%);
+}
+/* Feine Steinkörnung + große Wolken, beides als skalierbares SVG-Rauschen */
+.hero__stone::before,
+.hero__stone::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+.hero__stone::before {
+  opacity: 0.5;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320'%3E%3Cfilter id='n' x='0' y='0'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeDiffuseLighting lighting-color='%23fff' surfaceScale='1.4'%3E%3CfeDistantLight azimuth='225' elevation='48'/%3E%3C/feDiffuseLighting%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 320px 320px;
+}
+.hero__stone::after {
+  opacity: 0.35;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='900'%3E%3Cfilter id='m' x='0' y='0'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.006' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)'/%3E%3C/svg%3E");
+  background-size: 900px 900px;
+}
+/* Warmes Licht hinter dem Logo */
+.hero__spot {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  width: min(1400px, 140vw);
+  height: min(1000px, 110vh);
+  margin: calc(min(1000px, 110vh) / -2) 0 0 calc(min(1400px, 140vw) / -2);
+  background:
+    radial-gradient(closest-side, rgba(226, 184, 110, 0.2), rgba(226, 184, 110, 0.07) 45%, transparent 100%),
+    radial-gradient(30% 22% at 50% 50%, rgba(255, 232, 186, 0.08), transparent 100%);
+  pointer-events: none;
+}
+.hero--logo-vector .hero__vignette {
+  background:
+    radial-gradient(ellipse 80% 70% at 50% 46%, transparent 50%, rgba(8, 7, 6, 0.65) 100%),
+    linear-gradient(to bottom, rgba(8, 7, 6, 0.5) 0, transparent 18%, transparent 66%, rgba(12, 11, 9, 0.9) 100%);
+}
+
+.hero__logo {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 3vh 0;
+  text-align: center;
+  font-size: 1rem;
+  pointer-events: none;
+}
+.hero__logo-tilt {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  transform-style: preserve-3d;
+  /* Prägung: dunkle Unterkante, heller Grat oben, weicher Schatten */
+  filter: drop-shadow(0 -1px 0 rgba(255, 238, 196, 0.22)) drop-shadow(0 2px 0 rgba(58, 38, 10, 0.95))
+    drop-shadow(0 18px 28px rgba(0, 0, 0, 0.6));
+}
+.hero__mono {
+  display: block;
+  height: clamp(6rem, min(27vh, 32vw), 15.5rem);
+  width: auto;
+  aspect-ratio: 982 / 700;
+  margin-bottom: clamp(0.6rem, 2.2vh, 1.4rem);
+  overflow: visible;
+}
+.hero__mono-shine {
+  mix-blend-mode: overlay;
+}
+.hero__word,
+.hero__byline > span {
+  font-family: var(--serif);
+  font-weight: 600;
+  text-transform: uppercase;
+  background-image:
+    linear-gradient(105deg, transparent 42%, rgba(255, 250, 235, 0.9) 50%, transparent 58%),
+    linear-gradient(180deg, #fff1c9 0%, #e9c77f 20%, #a9782f 47%, #d6ad62 58%, #f6dfa3 76%, #8d6024 100%);
+  background-size: 300% 100%, 100% 100%;
+  background-position: 130% 0, 0 0;
+  background-repeat: no-repeat;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.hero__word {
+  display: block;
+  font-size: clamp(2.15rem, min(9.4vw, 11vh), 7.2rem);
+  line-height: 1;
+  letter-spacing: 0.075em;
+  padding: 0.04em 0 0.06em 0.075em;
+  white-space: nowrap;
+}
+.hero__byline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.1em;
+  width: 100%;
+  margin-top: clamp(0.5rem, 1.6vh, 1rem);
+  font-size: clamp(0.9rem, min(2.1vw, 2.6vh), 1.7rem);
+}
+.hero__byline > span {
+  letter-spacing: 0.32em;
+  padding-left: 0.32em;
+  white-space: nowrap;
+}
+.hero__byline i {
+  flex: 1;
+  max-width: 11em;
+  height: 2px;
+  background: linear-gradient(90deg, #7d5520, #f3d998 45%, #b4843a 70%, #8d6024);
+  box-shadow: 0 1px 0 rgba(40, 26, 6, 0.8);
+}
+.hero.is-shining .hero__word,
+.hero.is-shining .hero__byline > span {
+  animation: hero-word-shine 7s cubic-bezier(0.65, 0, 0.35, 1) 0.15s infinite;
+}
+@keyframes hero-word-shine {
+  0% {
+    background-position: 130% 0, 0 0;
+  }
+  45%,
+  100% {
+    background-position: -30% 0, 0 0;
+  }
+}
+@media (max-width: 900px) {
+  .hero__logo {
+    padding: 2vh 0 4vh;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero.is-shining .hero__word,
+  .hero.is-shining .hero__byline > span {
+    animation: none;
+  }
+}
+/* Feinschliff: tieferes, neutraleres Schwarz und zentrierte Kopfzeile */
+.hero--logo-vector .hero__stone {
+  background: radial-gradient(115% 85% at 50% 40%, #24211d 0%, #181715 45%, #0e0d0c 100%);
+}
+.hero--logo-vector .hero__stone::before {
+  opacity: 0.32;
+}
+.hero--logo-vector .hero__stone::after {
+  opacity: 0.22;
+}
+.hero--logo-vector .hero__kicker {
+  align-self: center;
+  margin: 1vh 0 0;
+  text-align: center;
+  color: rgba(241, 235, 225, 0.72);
+}

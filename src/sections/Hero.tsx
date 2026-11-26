@@ -1,16 +1,14 @@
 import { useEffect, useLayoutEffect, useRef } from 'react'
 import { Button } from '../components/Button'
 import { GoldDust } from '../components/GoldDust'
-import { Img } from '../components/Img'
 import { business } from '../data/content'
-import { asset } from '../lib/site'
+import { MONOGRAM_PATH, MONOGRAM_VIEWBOX } from '../data/monogram'
 import { gsap, isFinePointer, prefersReducedMotion } from '../lib/motion'
 
 /**
- * Startbereich: das goldene Logo als hochauflösender Vollbild-Hintergrund.
- * Eine unscharfe Kopie füllt jedes Bildschirmformat, darüber liegt das
- * scharfe Bild mit weich auslaufenden Rändern und einem Lichtschimmer,
- * der nur über die goldenen Buchstaben wandert.
+ * Startbereich: das Salon-Logo als Vektorgrafik in Gold auf dunklem
+ * Naturstein. Alles wird vom Browser gezeichnet und ist deshalb auf jedem
+ * Bildschirm gestochen scharf – vom Handy bis zum 5K-Monitor.
  */
 export function Hero({ start }: { start: boolean }) {
   const root = useRef<HTMLElement>(null)
@@ -19,8 +17,11 @@ export function Hero({ start }: { start: boolean }) {
   useLayoutEffect(() => {
     if (prefersReducedMotion()) return
     const ctx = gsap.context(() => {
-      gsap.set('.hero__bg-main', { scale: 1.28, autoAlpha: 0, filter: 'blur(16px) brightness(0.4)' })
-      gsap.set('.hero__bg-fill', { autoAlpha: 0 })
+      gsap.set('.hero__spot', { autoAlpha: 0, scale: 0.7 })
+      gsap.set('.hero__mono', { autoAlpha: 0, scale: 0.86, y: 30, filter: 'blur(14px)' })
+      gsap.set('.hero__word', { clipPath: 'inset(0% 50% 0% 50%)', letterSpacing: '0.32em' })
+      gsap.set('.hero__byline span', { autoAlpha: 0, y: 12 })
+      gsap.set('.hero__byline i', { scaleX: 0 })
       gsap.set('.hero__fade', { autoAlpha: 0, y: 24 })
       gsap.set('.hero__rule', { scaleX: 0 })
     }, root)
@@ -32,66 +33,53 @@ export function Hero({ start }: { start: boolean }) {
     if (!start || prefersReducedMotion()) return
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({ defaults: { ease: 'expo.out' } })
-      tl.to('.hero__bg-fill', { autoAlpha: 1, duration: 1.6, ease: 'power2.out' }, 0)
-        .to('.hero__bg-main', { autoAlpha: 1, duration: 1.4, ease: 'power2.out' }, 0.1)
-        .to('.hero__bg-main', { scale: 1, filter: 'blur(0px) brightness(1)', duration: 3.2 }, 0.1)
-        .add(() => root.current?.classList.add('is-shining'), 1.6)
-        .to('.hero__rule', { scaleX: 1, duration: 1.6, ease: 'expo.inOut' }, 1.1)
-        .to('.hero__fade', { autoAlpha: 1, y: 0, duration: 1.2, stagger: 0.1 }, 1.3)
+      tl.to('.hero__spot', { autoAlpha: 1, scale: 1, duration: 2.4, ease: 'power2.out' }, 0)
+        .to('.hero__mono', { autoAlpha: 1, scale: 1, y: 0, filter: 'blur(0px)', duration: 2, clearProps: 'filter' }, 0.2)
+        .to('.hero__word', { clipPath: 'inset(0% 0% 0% 0%)', letterSpacing: '0.075em', duration: 2.2, ease: 'expo.inOut', clearProps: 'clipPath,letterSpacing' }, 0.7)
+        .to('.hero__byline i', { scaleX: 1, duration: 1.6, ease: 'expo.inOut' }, 1.4)
+        .to('.hero__byline span', { autoAlpha: 1, y: 0, duration: 1.2 }, 1.6)
+        .add(() => root.current?.classList.add('is-shining'), 2.2)
+        .to('.hero__rule', { scaleX: 1, duration: 1.6, ease: 'expo.inOut' }, 1.6)
+        .to('.hero__fade', { autoAlpha: 1, y: 0, duration: 1.2, stagger: 0.1 }, 1.8)
 
-      // Scroll: Hintergrund wandert langsam und zoomt leicht, Inhalt blendet aus
-      gsap.to('.hero__bg-move', {
-        yPercent: 14,
-        scale: 1.08,
-        ease: 'none',
-        scrollTrigger: { trigger: root.current, start: 'top top', end: 'bottom top', scrub: true },
-      })
-      gsap.to('.hero__content', {
-        yPercent: -10,
-        autoAlpha: 0.2,
-        ease: 'none',
-        scrollTrigger: { trigger: root.current, start: 'top top', end: 'bottom top', scrub: true },
-      })
+      // Scroll: Logo schwebt langsam weg, Licht verblasst
+      const st = { trigger: root.current, start: 'top top', end: 'bottom top', scrub: true }
+      gsap.to('.hero__logo', { yPercent: 28, scale: 0.92, autoAlpha: 0, ease: 'none', scrollTrigger: st })
+      gsap.to('.hero__stone', { yPercent: 10, ease: 'none', scrollTrigger: st })
+      gsap.to('.hero__bottom', { autoAlpha: 0, ease: 'none', scrollTrigger: { ...st, end: '60% top' } })
     }, root)
     return () => ctx.revert()
   }, [start])
 
-  // Maus-Parallax auf dem Logo (Desktop)
+  // Maus: Logo neigt sich leicht, das Licht folgt (Desktop)
   useEffect(() => {
     const el = root.current
     if (!el || !isFinePointer() || prefersReducedMotion()) return
-    const main = el.querySelector('.hero__bg-tilt')
-    if (!main) return
-    const xTo = gsap.quickTo(main, 'x', { duration: 1.8, ease: 'power3.out' })
-    const yTo = gsap.quickTo(main, 'y', { duration: 1.8, ease: 'power3.out' })
+    const logo = el.querySelector('.hero__logo-tilt')
+    const spot = el.querySelector('.hero__spot')
+    if (!logo || !spot) return
+    gsap.set(logo, { transformPerspective: 1200 })
+    const rx = gsap.quickTo(logo, 'rotationX', { duration: 1.6, ease: 'power3.out' })
+    const ry = gsap.quickTo(logo, 'rotationY', { duration: 1.6, ease: 'power3.out' })
+    const sx = gsap.quickTo(spot, 'x', { duration: 2.2, ease: 'power3.out' })
+    const sy = gsap.quickTo(spot, 'y', { duration: 2.2, ease: 'power3.out' })
     const move = (e: PointerEvent) => {
-      xTo((e.clientX / innerWidth - 0.5) * -26)
-      yTo((e.clientY / innerHeight - 0.5) * -18)
+      const nx = e.clientX / innerWidth - 0.5
+      const ny = e.clientY / innerHeight - 0.5
+      ry(nx * 8)
+      rx(ny * -6)
+      sx(nx * 120)
+      sy(ny * 80)
     }
     el.addEventListener('pointermove', move)
     return () => el.removeEventListener('pointermove', move)
   }, [])
 
   return (
-    <section
-      ref={root}
-      id="top"
-      className="hero hero--cinema"
-      aria-labelledby="hero-title"
-      style={{ ['--hero-mask' as string]: `url(${asset('img/hero-logo-1200.webp')})` }}
-    >
+    <section ref={root} id="top" className="hero hero--logo-vector" aria-labelledby="hero-title">
       <div className="hero__bg" aria-hidden="true">
-        <div className="hero__bg-move">
-          <div className="hero__bg-fill">
-            <Img id="hero-logo" sizes="50vw" priority alt="" />
-          </div>
-          <div className="hero__bg-tilt">
-            <div className="hero__bg-main">
-              <Img id="hero-logo" priority sizes="(orientation: portrait) 148vw, max(100vw, 151svh)" alt="" />
-              <span className="hero__shine" />
-            </div>
-          </div>
-        </div>
+        <div className="hero__stone" />
+        <div className="hero__spot" />
         <div className="hero__vignette" />
       </div>
       <GoldDust />
@@ -101,8 +89,44 @@ export function Hero({ start }: { start: boolean }) {
           Friseurmeister-Salon <span aria-hidden="true">·</span> Leverkusen-{business.district}
         </p>
 
-        <h1 id="hero-title" className="sr-only">
-          Art of Hair by Simyan – Friseur in Leverkusen-{business.district}
+        <h1 id="hero-title" className="hero__logo" aria-label="Art of Hair by Simyan">
+          <span className="hero__logo-tilt" aria-hidden="true">
+            <svg className="hero__mono" viewBox={MONOGRAM_VIEWBOX} focusable="false">
+              <defs>
+                {/* Gebürstetes Gold: helle Kanten, dunkleres Band in der Mitte */}
+                <linearGradient id="heroGold" x1="0" y1="0" x2="0.35" y2="1">
+                  <stop offset="0" stopColor="#fff1c9" />
+                  <stop offset="0.18" stopColor="#e9c77f" />
+                  <stop offset="0.42" stopColor="#a9782f" />
+                  <stop offset="0.55" stopColor="#d6ad62" />
+                  <stop offset="0.72" stopColor="#f6dfa3" />
+                  <stop offset="1" stopColor="#8d6024" />
+                </linearGradient>
+                <linearGradient id="heroShine" x1="0" y1="0" x2="1" y2="0.25" gradientTransform="translate(-1 0)">
+                  <stop offset="0.38" stopColor="#fff" stopOpacity="0" />
+                  <stop offset="0.5" stopColor="#fff" stopOpacity="0.75" />
+                  <stop offset="0.62" stopColor="#fff" stopOpacity="0" />
+                  <animateTransform
+                    attributeName="gradientTransform"
+                    type="translate"
+                    values="-1 0; 1 0; 1 0"
+                    keyTimes="0; 0.45; 1"
+                    dur="7s"
+                    begin="3s"
+                    repeatCount="indefinite"
+                  />
+                </linearGradient>
+              </defs>
+              <path d={MONOGRAM_PATH} fill="url(#heroGold)" fillRule="evenodd" />
+              <path className="hero__mono-shine" d={MONOGRAM_PATH} fill="url(#heroShine)" fillRule="evenodd" />
+            </svg>
+            <span className="hero__word">Art of Hair</span>
+            <span className="hero__byline">
+              <i />
+              <span>By Simyan</span>
+              <i />
+            </span>
+          </span>
         </h1>
 
         <div className="hero__bottom">
