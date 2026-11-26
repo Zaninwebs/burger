@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Lokale Terminanfragen (nur Entwicklung)
+.data
+.netlify
+dist-preview

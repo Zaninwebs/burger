@@ -1,54 +1,60 @@
-# Der dicke Bub — Website
+# Art of Hair by Simyan — Website
 
-Cinematic React/TypeScript website for **Der dicke Bub**, Burger-Restaurant &
-Lieferservice in Leverkusen-Schlebusch.
+Premium-Website mit Terminanfrage-System für den Friseurmeister-Salon
+**Art of Hair by Simyan**, Lützenkirchener Str. 411, 51381 Leverkusen.
 
 ## Stack
 
-- React 19 + TypeScript, built with Vite
-- GSAP + ScrollTrigger for the "10 besten Gründe" pinned scroll sequence
-- A custom `ScrollStage` canvas engine (`src/components/ScrollStage.tsx`) for
-  the scroll-scrubbed burger explosion, following the
-  `frameIndex = round(scrollProgress * (totalFrames - 1))` principle
-- No image or audio assets required to run — see below
+- React 19 + TypeScript, Vite (Multi-Page: `/`, `/impressum/`, `/datenschutz/`, `/admin/`)
+- GSAP + ScrollTrigger (Motion-System), Lenis (Smooth Scroll, nur Desktop)
+- Schriften selbst gehostet (Cormorant Garamond, Manrope) – keine Google-Verbindung
+- Backend: Netlify Functions + Netlify Blobs (persistente Datenbank)
 
-## Getting started
+## Entwicklung
 
 ```bash
 npm install
-npm run dev      # local dev server
-npm run build    # type-check + production build
-npm run preview  # preview the production build
+npm run dev       # http://localhost:5173 – inkl. lokaler Termin-API (Daten in .data/)
+npm run build     # Typprüfung + Produktions-Build
+npm run images    # Bilder aus images-src/ neu verarbeiten (AVIF/WebP)
 ```
 
-## Content policy
+Lokal lautet das Admin-Passwort `admin` (nur Entwicklung).
 
-All business facts (address, phone, opening hours, delivery times, story,
-quality claims, the "10 besten Gründe") live in `src/data/content.ts` and are
-sourced from the real derdickebub.de site and the owner-provided brief.
-**Do not add invented prices, dishes, or claims to this file.**
+## Deployment (Netlify)
 
-## Assets
+Umgebungsvariablen im Netlify-Dashboard setzen:
 
-This build ships with **no photography, logo file, or audio** — none were
-retrievable in the environment it was built in. Instead:
+| Variable | Pflicht | Zweck |
+|---|---|---|
+| `ADMIN_PASSWORD` | ja | Passwort für `/admin/` (mind. 10 Zeichen) |
+| `DATA_ENCRYPTION_KEY` | ja | Zufälliger Schlüssel (≥ 32 Zeichen), verschlüsselt Kundendaten. **Nie ändern oder verlieren** – sonst sind gespeicherte Anfragen unlesbar. |
+| `RESEND_API_KEY` | nein | E-Mail-Benachrichtigung bei neuen Anfragen (resend.com) |
+| `NOTIFY_EMAIL_TO` / `NOTIFY_EMAIL_FROM` | nein | Empfänger / verifizierter Absender |
+| `NOTIFY_INCLUDE_CONTACT` | nein | `true` = Kontaktdaten in der Mail (Standard: nein, Datenminimierung) |
+| `RETENTION_DAYS` | nein | Löschfrist nach Termin (Standard 30) |
 
-- The hero/explosion burger is rendered procedurally on `<canvas>`
-  (`src/lib/burgerRenderer.ts`) using the real ingredient list, so the site
-  looks intentional and works immediately.
-- The logo is a typographic wordmark of the real business name, not a
-  fabricated logo mark.
-- Every `public/assets/*` subfolder has a short README describing exactly
-  what to drop in and which component to wire it into once real photography,
-  the logo file, a portrait of Shahram Rahmani, or sound design become
-  available. No other code changes should be required.
+Schlüssel erzeugen: `openssl rand -base64 48`
 
-## Structure
+## Terminsystem
 
-```
-src/
-  components/   one component per section (Hero, ScrollStage, BurgerExplosion, ...)
-  data/         content.ts — the single source of truth for real content
-  hooks/        useReducedMotion, useFramePreloader, useRevealOnScroll, useHorizontalWheel
-  lib/          burgerRenderer.ts — procedural canvas drawing
-```
+- Kunden stellen eine **unverbindliche Anfrage** (Leistung → Tag → optional Uhrzeit → Kontakt).
+- Kalender zeigt pro Tag: verfügbar / teilweise / ausgebucht / geschlossen.
+  Mo + So, NRW-Feiertage und vergangene Tage sind automatisch geschlossen.
+- Zeitfenster: Di–Fr 09–17 Uhr, Sa 09–13 Uhr (stündlich, `shared/booking.ts`).
+- Doppelbuchungen werden atomar verhindert (`onlyIfNew`-Sperre pro Zeitfenster).
+- `/admin/`: Anfragen bestätigen/ablehnen/erledigen, Notizen, löschen;
+  Tage manuell setzen, einzelne Zeitfenster blockieren, öffentliche Hinweise.
+- DSGVO: Kontaktdaten AES-256-GCM verschlüsselt, IP nur als Hash (24 h),
+  tägliche automatische Löschung (`netlify/functions/cleanup.mts`), keine Cookies/Tracking.
+
+## Inhalte & Bilder
+
+- Alle Geschäftsdaten: `src/data/content.ts` (Preise, Team, Leistungen). Nichts erfinden.
+- Neue Bilder: Datei nach `images-src/` legen, in `scripts/images.mjs` eintragen
+  (inkl. `focus` für den Bildausschnitt), `npm run images`, dann per `<Img id="…" />` nutzen.
+- Das AH-Monogramm ist aus dem Original-Logo vektorisiert (`src/data/monogram.ts`).
+
+## Offene Punkte
+
+- Impressum/Datenschutz: gelb markierte Platzhalter mit den bisherigen Texten abgleichen.
