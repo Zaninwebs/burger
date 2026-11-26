@@ -19,6 +19,9 @@ export const business = {
   /** Öffnet die Routenplanung zum Salon (auf dem Handy direkt in der Google-Maps-App) */
   routeUrl:
     'https://www.google.com/maps/dir/?api=1&destination=Art+of+Hair+by+Simyan%2C+L%C3%BCtzenkirchener+Str.+411%2C+51381+Leverkusen',
+  /** Route in Apple Karten (iPhone) und Waze */
+  appleMapsUrl: 'https://maps.apple.com/?daddr=L%C3%BCtzenkirchener+Str.+411,+51381+Leverkusen&dirflg=d',
+  wazeUrl: 'https://waze.com/ul?q=L%C3%BCtzenkirchener%20Str.%20411%2C%2051381%20Leverkusen&navigate=yes',
   mapsEmbedUrl:
     'https://maps.google.com/maps?q=L%C3%BCtzenkirchener+Str.+411%2C+51381+Leverkusen&z=16&output=embed',
   mapsUrl: 'https://www.google.com/maps/search/?api=1&query=Art+of+Hair+by+Simyan+L%C3%BCtzenkirchener+Str.+411+51381+Leverkusen',

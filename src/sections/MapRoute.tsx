@@ -1,144 +1,220 @@
 import { useEffect, useRef, useState } from 'react'
 import { Img } from '../components/Img'
 import { business } from '../data/content'
+import { MONOGRAM_PATH, MONOGRAM_VIEWBOX } from '../data/monogram'
 import { onConsentChange, readConsent, saveConsent } from '../lib/consent'
 import { siteUrl } from '../lib/site'
 
-const PinIcon = () => (
-  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <path d="M12 21s-7-6.2-7-11.5A7 7 0 0119 9.5C19 14.8 12 21 12 21z" stroke="currentColor" strokeWidth="1.6" />
-    <circle cx="12" cy="9.5" r="2.6" stroke="currentColor" strokeWidth="1.6" />
+/** Gewundene Strecke vom Besucher zum Salon (rein dekorativ, keine echten Straßen). */
+const ROUTE = 'M90 380 C 200 380, 190 290, 310 286 S 460 322, 492 236 S 560 120, 680 114'
+
+const GoogleIcon = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M12 21s-7-6.2-7-11.5A7 7 0 0119 9.5C19 14.8 12 21 12 21z" stroke="currentColor" strokeWidth="1.7" />
+    <circle cx="12" cy="9.5" r="2.6" stroke="currentColor" strokeWidth="1.7" />
+  </svg>
+)
+const AppleIcon = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M12 3l8 18-8-4-8 4 8-18z" stroke="currentColor" strokeWidth="1.7" strokeLinejoin="round" />
+  </svg>
+)
+const WazeIcon = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path
+      d="M4 13.5C4 8.8 7.6 5 12.2 5S20 8.4 20 12.6c0 3.4-2.6 5.6-5.6 5.6H10c-1.6 0-2.6.8-3.4 1.8-.4-1.4-1.2-2.4-2-3.2-.4-.9-.6-2-.6-3.3z"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinejoin="round"
+    />
+    <circle cx="10" cy="11" r="1" fill="currentColor" />
+    <circle cx="14.5" cy="11" r="1" fill="currentColor" />
   </svg>
 )
 
 /**
- * Anfahrt: Ein Tipp auf die Karte öffnet die Routenplanung in Google Maps.
- * Die eingebettete Google-Karte lädt erst nach Klick auf „Karte laden“
- * (Zwei-Klick-Lösung, DSGVO) – vorher wird nichts von Google geladen.
+ * Anfahrt: Foto vom Eingang mit der Adresse (einziger Ort auf der Seite),
+ * daneben eine animierte Route zum Salon und die Wahl der Navigations-App.
+ * Die echte Google-Karte lädt nur mit Einwilligung (Cookie-Banner).
  */
 export function MapRoute() {
-  // Karte nur mit Einwilligung „Externe Medien“ (Cookie-Banner oder Knopf unten)
   const [live, setLive] = useState(() => readConsent()?.media ?? false)
   useEffect(() => onConsentChange((c) => setLive(c.media)), [])
-  const canvas = useRef<HTMLCanvasElement>(null)
 
-  // Dezente, animierte Höhenlinien als Platzhalter (keine echten Straßen)
+  // Route zeichnet sich, sobald der Bereich ins Bild kommt
+  const stage = useRef<HTMLDivElement>(null)
+  const [inView, setInView] = useState(false)
   useEffect(() => {
-    const c = canvas.current
-    if (!c || live) return
-    const ctx = c.getContext('2d')
-    if (!ctx) return
-    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches
-    let raf = 0
-    let t = 0
-    const draw = () => {
-      const r = c.getBoundingClientRect()
-      const dpr = Math.min(devicePixelRatio || 1, 2)
-      if (c.width !== Math.round(r.width * dpr)) {
-        c.width = r.width * dpr
-        c.height = r.height * dpr
-      }
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
-      ctx.clearRect(0, 0, r.width, r.height)
-      const cx = r.width / 2
-      const cy = r.height / 2
-      for (let i = 1; i < 16; i++) {
-        ctx.beginPath()
-        for (let a = 0; a <= Math.PI * 2 + 0.05; a += 0.05) {
-          const wobble = Math.sin(a * 3 + i * 0.7 + t) * 6 + Math.cos(a * 5 - i + t * 0.6) * 4
-          const rad = i * 34 + wobble
-          const x = cx + Math.cos(a) * rad * 1.25
-          const y = cy + Math.sin(a) * rad * 0.85
-          if (a === 0) ctx.moveTo(x, y)
-          else ctx.lineTo(x, y)
+    const el = stage.current
+    if (!el) return
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting) {
+          setInView(true)
+          io.disconnect()
         }
-        ctx.strokeStyle = `rgba(207, 171, 112, ${0.22 - i * 0.012})`
-        ctx.lineWidth = 1
-        ctx.stroke()
-      }
-      t += 0.006
-      if (!reduce) raf = requestAnimationFrame(draw)
-    }
-    draw()
-    return () => cancelAnimationFrame(raf)
+      },
+      { threshold: 0.35 },
+    )
+    io.observe(el)
+    return () => io.disconnect()
   }, [live])
 
   return (
-    <section id="anfahrt" className="map section" aria-labelledby="map-title">
-      <div className="wrap map__grid">
-        <div className="map__text">
+    <section id="anfahrt" className="route section" aria-labelledby="map-title">
+      <div className="wrap">
+        <header className="route__head">
           <p className="eyebrow">Anfahrt</p>
           <h2 id="map-title" className="h-lg" data-reveal="text">
             So finden Sie <em>zu uns.</em>
           </h2>
-          <figure className="map__photo">
-            <Img id="salon-front" reveal sizes="(min-width: 900px) 36vw, 100vw" />
-            <figcaption>Unser Eingang · {business.street}</figcaption>
-          </figure>
-          <address className="map__address" data-reveal="fade">
-            {business.name}
-            <br />
-            {business.street}
-            <br />
-            {business.zip} {business.city}-{business.district}
-          </address>
-          <a href={business.routeUrl} target="_blank" rel="noopener noreferrer" className="map__btn" data-reveal="fade">
-            <span className="map__btn-icon">
-              <PinIcon />
-            </span>
-            <span>
-              <small>Mit Google Maps</small>
-              <strong>Route anzeigen</strong>
-            </span>
-          </a>
-        </div>
+        </header>
 
-        <div className="map__frame" data-reveal="fade">
-          {live ? (
-            <iframe
-              title={`Karte: ${business.street}, ${business.zip} ${business.city}`}
-              src={business.mapsEmbedUrl}
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              allowFullScreen
-            />
-          ) : (
-            <a
-              href={business.routeUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="map__placeholder"
-              aria-label="Route zum Salon in Google Maps anzeigen"
-              data-cursor="Route"
-            >
-              <canvas ref={canvas} aria-hidden="true" />
-              <span className="map__pin" aria-hidden="true">
-                <i />
-                <i />
-                <b>
-                  <PinIcon />
-                </b>
+        <div className="route__grid">
+          <figure className="route__photo">
+            <Img id="salon-front" reveal sizes="(min-width: 900px) 40vw, 100vw" />
+            <figcaption className="route__address">
+              <small>Ihr Ziel</small>
+              <strong>{business.name}</strong>
+              <span>
+                {business.street} · {business.zip} {business.city}-{business.district}
               </span>
-              <span className="map__label">
-                <strong>Art of Hair by Simyan</strong>
-                <span>{business.street}</span>
-              </span>
-              <span className="map__tap">Tippen für die Route →</span>
-            </a>
-          )}
-          {!live && (
-            <div className="map__consent">
-              <button type="button" onClick={() => saveConsent(true)}>
-                Interaktive Karte laden
-              </button>
-              <p>
-                Dabei werden Daten an Google übertragen.{' '}
+            </figcaption>
+          </figure>
+
+          <div className="route__panel">
+            <div ref={stage} className={`route__stage ${inView ? 'is-in' : ''}`}>
+              {live ? (
+                <iframe
+                  title={`Karte: ${business.name}`}
+                  src={business.mapsEmbedUrl}
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  allowFullScreen
+                />
+              ) : (
+                <a
+                  href={business.routeUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="route__journey"
+                  aria-label="Route zum Salon in Google Maps starten"
+                  data-cursor="Route"
+                >
+                  <svg viewBox="0 0 800 450" aria-hidden="true" focusable="false">
+                    <defs>
+                      <linearGradient id="routeGold" x1="0" y1="1" x2="1" y2="0">
+                        <stop offset="0" stopColor="#8d6024" />
+                        <stop offset="0.5" stopColor="#f3d998" />
+                        <stop offset="1" stopColor="#cfab70" />
+                      </linearGradient>
+                      <radialGradient id="routeGlow">
+                        <stop offset="0" stopColor="#ffe9b8" stopOpacity="1" />
+                        <stop offset="1" stopColor="#ffe9b8" stopOpacity="0" />
+                      </radialGradient>
+                    </defs>
+
+                    {/* angedeutete Straßen */}
+                    <g className="route__streets">
+                      <path d="M0 120 C 220 140, 420 90, 800 70" />
+                      <path d="M0 250 C 160 230, 360 270, 800 225" />
+                      <path d="M0 360 C 240 340, 520 380, 800 350" />
+                      <path d="M180 0 C 200 150, 150 300, 190 450" />
+                      <path d="M400 0 C 380 160, 430 300, 400 450" />
+                      <path d="M610 0 C 630 140, 580 300, 620 450" />
+                    </g>
+
+                    {/* Strecke */}
+                    <path className="route__track" d={ROUTE} />
+                    <path className="route__line" d={ROUTE} pathLength={1} />
+                    <path className="route__dash" d={ROUTE} />
+
+                    {/* leuchtender Punkt fährt die Strecke ab */}
+                    <g className="route__car">
+                      <circle r="18" fill="url(#routeGlow)" opacity="0.55" />
+                      <circle r="5.5" fill="#fff4d8" />
+                      <animateMotion
+                        dur="5s"
+                        begin="1.6s"
+                        repeatCount="indefinite"
+                        path={ROUTE}
+                        keyPoints="0;1;1"
+                        keyTimes="0;0.8;1"
+                        calcMode="linear"
+                      />
+                    </g>
+
+                    {/* Start */}
+                    <g className="route__start" transform="translate(90 380)">
+                      <circle className="route__ping" r="10" />
+                      <circle r="7" fill="#f4efe7" />
+                      <circle r="3" fill="#15120f" />
+                      <text x="16" y="28">
+                        Ihr Standort
+                      </text>
+                    </g>
+
+                    {/* Ziel: Salon mit AH-Monogramm */}
+                    <g className="route__goal" transform="translate(680 114)">
+                      <circle className="route__ring route__ring--1" r="34" />
+                      <circle className="route__ring route__ring--2" r="34" />
+                      <circle r="34" fill="url(#routeGold)" />
+                      <circle r="30" fill="#15120f" />
+                      <svg x="-19" y="-14" width="38" height="28" viewBox={MONOGRAM_VIEWBOX}>
+                        <path d={MONOGRAM_PATH} fill="url(#routeGold)" fillRule="evenodd" />
+                      </svg>
+                      <text y="62" textAnchor="middle">
+                        Art of Hair
+                      </text>
+                    </g>
+                  </svg>
+                  <span className="route__tap">
+                    Tippen und losfahren <span aria-hidden="true">→</span>
+                  </span>
+                </a>
+              )}
+            </div>
+
+            <p className="route__lead">Wählen Sie Ihre Navigations-App – die Route startet sofort.</p>
+            <div className="route__apps">
+              <a
+                href={business.routeUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="route__app route__app--main"
+              >
+                <GoogleIcon />
+                <span>
+                  <small>Route mit</small>Google Maps
+                </span>
+              </a>
+              <a href={business.appleMapsUrl} target="_blank" rel="noopener noreferrer" className="route__app">
+                <AppleIcon />
+                <span>
+                  <small>Route mit</small>Apple Karten
+                </span>
+              </a>
+              <a href={business.wazeUrl} target="_blank" rel="noopener noreferrer" className="route__app">
+                <WazeIcon />
+                <span>
+                  <small>Route mit</small>Waze
+                </span>
+              </a>
+            </div>
+
+            {!live && (
+              <p className="route__consent">
+                <button type="button" onClick={() => saveConsent(true)} className="link-u">
+                  Interaktive Google-Karte anzeigen
+                </button>{' '}
+                – dabei werden Daten an Google übertragen (
                 <a href={siteUrl('/datenschutz/')} className="link-u">
                   Datenschutz
                 </a>
+                ).
               </p>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </section>

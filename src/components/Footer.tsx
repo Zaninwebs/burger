@@ -2,7 +2,7 @@ import { useLayoutEffect, useRef } from 'react'
 import { MONOGRAM_PATH, MONOGRAM_VIEWBOX } from '../data/monogram'
 import { business, hours } from '../data/content'
 import { gsap, prefersReducedMotion } from '../lib/motion'
-import { IS_DEMO, siteUrl } from '../lib/site'
+import { siteUrl } from '../lib/site'
 import { Button } from './Button'
 import { GoldDust } from './GoldDust'
 import { openConsent } from '../lib/consent'
@@ -23,16 +23,29 @@ export function Footer({ home = true }: { home?: boolean }) {
         gsap.set(p, { strokeDasharray: l, strokeDashoffset: l })
       })
       const tl = gsap.timeline({
-        scrollTrigger: { trigger: root.current, start: 'top 80%', end: 'top 10%', scrub: 0.8 },
+        scrollTrigger: {
+          trigger: root.current,
+          start: 'top 80%',
+          end: 'top 10%',
+          scrub: 0.8,
+        },
       })
-      tl.to(paths, { strokeDashoffset: 0, ease: 'none', stagger: 0.02 })
-        .fromTo('.footer__mono-fill', { opacity: 0 }, { opacity: 1, ease: 'none' }, 0.6)
+      tl.to(paths, { strokeDashoffset: 0, ease: 'none', stagger: 0.02 }).fromTo(
+        '.footer__mono-fill',
+        { opacity: 0 },
+        { opacity: 1, ease: 'none' },
+        0.6,
+      )
       gsap.from('.footer__brand-line > span', {
         yPercent: 110,
         duration: 1.4,
         stagger: 0.1,
         ease: 'expo.out',
-        scrollTrigger: { trigger: '.footer__brand', start: 'top 92%', once: true },
+        scrollTrigger: {
+          trigger: '.footer__brand',
+          start: 'top 92%',
+          once: true,
+        },
       })
     }, root)
     return () => ctx.revert()
@@ -55,7 +68,14 @@ export function Footer({ home = true }: { home?: boolean }) {
               </linearGradient>
             </defs>
             {SUBPATHS.map((d, i) => (
-              <path key={i} className="footer__mono-stroke" d={d} fill="none" stroke="url(#ft-gold)" strokeWidth={2.5} />
+              <path
+                key={i}
+                className="footer__mono-stroke"
+                d={d}
+                fill="none"
+                stroke="url(#ft-gold)"
+                strokeWidth={2.5}
+              />
             ))}
             <path className="footer__mono-fill" d={MONOGRAM_PATH} fill="url(#ft-gold)" fillRule="evenodd" />
           </svg>
@@ -69,45 +89,48 @@ export function Footer({ home = true }: { home?: boolean }) {
           </div>
         </div>
 
-        <div className="footer__cols">
-          <div>
-            <h3>Adresse</h3>
-            <p>
-              {business.street}
-              <br />
-              {business.zip} {business.city}
-            </p>
-            <a href={business.mapsUrl} target="_blank" rel="noopener noreferrer" className="link-u">
-              Route planen
-            </a>
-          </div>
-          <div>
-            <h3>Kontakt</h3>
-            <p>
-              <a href={business.phoneHref} className="link-u">
-                {business.phoneDisplay}
+        {/* Auf der Startseite stehen Adresse, Kontakt und Zeiten schon direkt darüber */}
+        {!home && (
+          <div className="footer__cols">
+            <div>
+              <h3>Adresse</h3>
+              <p>
+                {business.street}
+                <br />
+                {business.zip} {business.city}
+              </p>
+              <a href={business.mapsUrl} target="_blank" rel="noopener noreferrer" className="link-u">
+                Route planen
               </a>
-              <br />
-              <a href={`mailto:${business.email}`} className="link-u">
-                {business.email}
-              </a>
-              <br />
-              <a href={business.instagramUrl} target="_blank" rel="noopener noreferrer" className="link-u">
-                Instagram @{business.instagram}
-              </a>
-            </p>
+            </div>
+            <div>
+              <h3>Kontakt</h3>
+              <p>
+                <a href={business.phoneHref} className="link-u">
+                  {business.phoneDisplay}
+                </a>
+                <br />
+                <a href={`mailto:${business.email}`} className="link-u">
+                  {business.email}
+                </a>
+                <br />
+                <a href={business.instagramUrl} target="_blank" rel="noopener noreferrer" className="link-u">
+                  Instagram @{business.instagram}
+                </a>
+              </p>
+            </div>
+            <div>
+              <h3>Öffnungszeiten</h3>
+              <p>
+                Di – Fr {open[0].value}
+                <br />
+                Sa {open[open.length - 1].value}
+                <br />
+                So &amp; Mo geschlossen
+              </p>
+            </div>
           </div>
-          <div>
-            <h3>Öffnungszeiten</h3>
-            <p>
-              Di – Fr {open[0].value}
-              <br />
-              Sa {open[open.length - 1].value}
-              <br />
-              So &amp; Mo geschlossen
-            </p>
-          </div>
-        </div>
+        )}
 
         <p className="footer__brand" aria-label="Art of Hair by Simyan">
           <span className="footer__brand-line" aria-hidden="true">
@@ -145,11 +168,15 @@ export function Footer({ home = true }: { home?: boolean }) {
             <small>Folgen Sie uns auf Instagram</small>
             <strong>@{business.instagram}</strong>
           </span>
-          <span className="footer__insta-arrow" aria-hidden="true">→</span>
+          <span className="footer__insta-arrow" aria-hidden="true">
+            →
+          </span>
         </a>
 
         <div className="footer__legal">
-          <span>© {year} {business.name}</span>
+          <span>
+            © {year} {business.name}
+          </span>
           <nav aria-label="Rechtliches">
             <a href={siteUrl('/impressum/')} className="link-u">
               Impressum
@@ -160,17 +187,9 @@ export function Footer({ home = true }: { home?: boolean }) {
             <button type="button" className="link-u footer__cookie" onClick={openConsent}>
               Cookie-Einstellungen
             </button>
-            {IS_DEMO && (
-              <a href={siteUrl('/admin/')} className="link-u">
-                Inhaber-Login (Demo)
-              </a>
-            )}
           </nav>
         </div>
         <CookieBanner />
-        <p className="footer__credit">
-          Website erstellt von <strong>Zaninweb</strong>
-        </p>
       </div>
     </footer>
   )
